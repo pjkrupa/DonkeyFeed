@@ -45,7 +45,7 @@ class RSSfeed:
         return self.findings
 
     def print_to_html(self, save_path):
-        date_and_time = self.currentdate.strftime("%Y%m%d_%H%M%S")
+        date_and_time = self.currentdate.strftime("%Y_%m_%d_%H%M")
         html_file_path = save_path + date_and_time + '.html'
         if len(self.findings) == 0:
             result = "You don't have any results to print"
