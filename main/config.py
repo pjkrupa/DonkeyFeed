@@ -7,14 +7,7 @@ import configparser
 class Configs:
     def __init__(self, file_location):
         self.configurations = configparser.ConfigParser()
-        with open(file_location, 'r') as f:
-            file_contents = f.read()
-            print("File Contents:\n", file_contents)
-
         self.configurations.read(file_location)
-        for item in self.configurations:
-            print("Section:", item)
-
 
     def save_results_path(self):
         save_path = self.configurations['user_paths']['results_path']

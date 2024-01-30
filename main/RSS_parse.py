@@ -8,7 +8,7 @@ import datetime
 # i need THREE methods that 1) parse the feed and put it in a dictionary; 2) search the parts of feed
 # using the parameters set by the user; 3) put the results to an HTML file and open it in a browser
 
-class RSSfeed:
+class RSSfilter:
     def __init__(self, rss_link):
         self.rss_dict = fp.parse(rss_link)          # parses the RSS feed
         self.currentdate = datetime.datetime.now()  # creates a datetime object for comparison later
@@ -30,18 +30,17 @@ class RSSfeed:
                     self.rss_feed_items.append(dict)     # adds a dictionary for each entry to the list
         return self.rss_feed_items
 
-    def filter(self, *keywords):
-        self.search_terms = keywords
+    def filter(self, keyword):
+        self.search_term = keyword
         self.findings.clear()
         for item in self.rss_feed_items:
-            for keyword in keywords:
-                if keyword in item['title'] or keyword in item['summary']:
-                    dict = {
-                        'title': item['title'],
-                        'link': item['link'],
-                        'summary': item['summary']
+            if keyword in item['title'] or keyword in item['summary']:
+                dict = {
+                    'title': item['title'],
+                    'link': item['link'],
+                    'summary': item['summary']
                     }
-                    self.findings.append(dict)
+                self.findings.append(dict)
         return self.findings
 
     def print_to_html(self, save_path):
