@@ -1,13 +1,6 @@
 import feedparser as fp
 import datetime
 
-# this is a class that should return a list of dictionaries for a single RSS feed from the previous five days
-# the dictionaries will have the keys headline, link, and summary
-# this will provide a streamlined way to iterate through the content of a parsed RSS feed
-# as objects and place them in a Tkinter widget
-# i need THREE methods that 1) parse the feed and put it in a dictionary; 2) search the parts of feed
-# using the parameters set by the user; 3) put the results to an HTML file and open it in a browser
-
 class RSSfilter:
     def __init__(self, rss_link):
         self.rss_dict = fp.parse(rss_link)          # parses the RSS feed
@@ -17,6 +10,7 @@ class RSSfilter:
         self.findings = []
 
     def process(self, days):
+        self.days = days
         self.rss_feed_items.clear()                        # clears the list of dictionaries
         for item in self.rss_dict.entries:
             if 'published_parsed' in item:
@@ -59,8 +53,8 @@ class RSSfilter:
                         <body>
                         <p><h1>{feed_title}</h1></p>
                         <p><h2>Here are your search results for today:</h2></p>
-                        <p>Your search terms were {search_terms}</p>
-                       """.format(feed_title=self.feed_title, search_terms=self.search_terms))
+                        <p>You filtered for mentions of {search_term} from the last {num} days.</p>
+                       """.format(feed_title=self.feed_title, search_term=self.search_term, num=self.days))
                 for item in self.findings:
                     file.write('<h3>{title}</h3>'.format(title=item['title']))
                     file.write('<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))

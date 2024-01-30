@@ -4,7 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="set up a config file" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="lots of work on the UI menus">
+      <change afterPath="$PROJECT_DIR$/main/user/search_results/2024_01_30_1845.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/user/search_results/2024_01_30_1852.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/user/search_results2024_01_30_1841.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/RSS_parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/RSS_parse.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/config.ini" beforeDir="false" afterPath="$PROJECT_DIR$/main/config.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/user/saved_feed_filters.csv" beforeDir="false" afterPath="$PROJECT_DIR$/main/user/saved_feed_filters.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/play.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/play.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_RSS_parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_RSS_parse.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -31,26 +45,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python.RSS_parse.executor&quot;: &quot;Run&quot;,
-    &quot;Python.config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.gui.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.play.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_RSS_parse.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/peter/PycharmProjects/DonkeyFeed/tests&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python.RSS_parse.executor": "Run",
+    "Python.config.executor": "Run",
+    "Python.gui.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.play.executor": "Run",
+    "Python.test_RSS_parse.executor": "Run",
+    "Python.test_database.executor": "Run",
+    "Python.ui.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/peter/PycharmProjects/DonkeyFeed/tests",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
     ]
   }
-}</component>
+}]]></component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings>
@@ -138,8 +155,19 @@
       <option name="project" value="LOCAL" />
       <updated>1706619939691</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="lots of work on the UI menus">
+      <option name="closed" value="true" />
+      <created>1706620043956</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1706620043956</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.csv" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -153,10 +181,12 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="first commit!" />
     <MESSAGE value="added a class for RSS parsing" />
     <MESSAGE value="finished RSS parser. it now saves files." />
     <MESSAGE value="set up a config file" />
-    <option name="LAST_COMMIT_MESSAGE" value="set up a config file" />
+    <MESSAGE value="lots of work on the UI menus" />
+    <option name="LAST_COMMIT_MESSAGE" value="lots of work on the UI menus" />
   </component>
 </project>

@@ -1,2 +1,4 @@
 RSS feed name,Filter description,Filter term,URL,Last run
 peterkrupa dot lol,peter's posts on ChatGPT,ChatGPT,http://www.peterkrupa.lol,False
+Techcruch,Techcruch ChatGPT search,ChatGPT,https://techcrunch.com/feed/,False
+Techcrunch,mentions of Yelp,Yelp,https://techcrunch.com/feed/,False

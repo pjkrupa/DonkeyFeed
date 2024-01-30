@@ -8,10 +8,9 @@ configurations = Configs('config.ini')
 # plus a number of methods for doing stuff with it.
 main_df = Dataframe(configurations.rss_filters_path())
 
-print('Hello! Welcome to DonkeyFeed, the worst RSS filter!')
+print('Hello! Welcome to DonkeyFeed, the worst RSS filter!\n')
 main_loop = Session(main_df)
 main_loop.main_menu()
-
 
 
 

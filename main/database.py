@@ -12,11 +12,11 @@ class Dataframe:
         row = self.df.iloc[index].tolist()
         return row
 
-    def delete_row(self, index):
-        self.df.drop(index=index)
+    def delete_row(self, arg):
+        self.df.drop(index=arg, inplace=True)
 
     def save_timestamp(self, date_time, index):
-        self.df.loc[index, 3] = date_time
+        self.df.loc[index, 4] = date_time
 
     def add_row(self, feed_name, filter_description, filter_term, url):
         new_row = {
@@ -26,7 +26,7 @@ class Dataframe:
             'URL': url,
             'Last run': False
         }
-        self.df = self.df.append(new_row, ignore_index=True)
+        self.df.loc[len(self.df)] = new_row
 
     # This little method overwrites the saved .CSV file with the new dataframe so if the program
     # uses the .CSV file to instantiate a new version of the dataframe, it will be up to date.
