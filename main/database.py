@@ -1,37 +1,46 @@
-import pandas as pd
+import json
+import os
 
-RSS_urls = {1:"http://rss.cnn.com/rss/edition_europe.rss", 2:"https://www.peterkrupa.lol/feed", 3:"https://techcrunch.com/feed/" }
-feeds = ["http://rss.cnn.com/rss/edition_europe.rss", "https://www.peterkrupa.lol/feed", "https://techcrunch.com/feed/"]
 
-class Dataframe:
-    def __init__(self, file_location):
-        self.file_location = file_location
-        self.df = pd.read_csv(file_location)
+class Roster:
 
-    def get_row(self, index):
-        row = self.df.iloc[index].tolist()
-        return row
+    def __init__(self, roster_path):
+        # defines the path where the RSS roster is located
+        self.roster_path = os.path.join(roster_path, 'RSS feed filters.json')
+        self.roster_loaded = self.load_roster()
 
-    def delete_row(self, arg):
-        self.df.drop(index=arg, inplace=True)
+    def load_roster(self):
+        try:
+            with open(self.roster_path, 'r') as f:
+                json_data = json.load(f)
+        except FileNotFoundError as e:
+            print("Error when loading the file: ", str(e))
+        return json_data
 
-    def save_timestamp(self, date_time, index):
-        self.df.loc[index, 4] = date_time
+    def save_roster(self):
+        try:
+            with open(self.roster_path, 'w') as f:
+                json.dump(self.roster_loaded, f)
+        except FileNotFoundError as e:
+            print("Error when saving the file: ", str(e))
 
-    def add_row(self, feed_name, filter_description, filter_term, url):
-        new_row = {
-            'RSS feed name': feed_name,
-            'Filter description': filter_description,
-            'Filter term': filter_term,
-            'URL': url,
-            'Last run': False
-        }
-        self.df.loc[len(self.df)] = new_row
+    # to call this method, you need the index number of the RSS feed and a list of keywords to add as arguments
+    def add_keywords(self, index_num, new_keywords):
+        for string in new_keywords:
+            self.roster_loaded[index_num]['keywords'].append(string)
+        self.save_roster()
 
-    # This little method overwrites the saved .CSV file with the new dataframe so if the program
-    # uses the .CSV file to instantiate a new version of the dataframe, it will be up to date.
-    def save_csv(self):
-        self.df.to_csv(self.file_location, index=False, mode='w')
+    # to call this method, you need the index number of the RSS feed and a keyword as arguments
+    def remove_keyword(self, index_num, nix_keyword):
+        self.roster_loaded[index_num]['keywords'].remove(nix_keyword)
+        self.save_roster()
 
-# column headers in the database:
-# RSS feed name,Filter description,Filter term,URL,Last run
+    # to call this method, you need the index number of the RSS feed.
+    def remove_rss_feed(self, index_num):
+        self.roster_loaded.remove(index_num)
+        self.save_roster()
+
+
+
+
+

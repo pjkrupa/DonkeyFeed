@@ -1,115 +1,105 @@
-import tkinter as tk
-from tkinter import ttk
-import pandas as pd
-from database import Dataframe
+from database import Roster
 from RSS_parse import RSSfilter
 from config import Configs
 configurations = Configs('config.ini')
 
-class Session:
-    # rather than getting the dataframe, I am getting the dataframe class object instantiated in main, which
-    # includes the dataframe plus a number of methods for operating on the dataframe
-    def __init__(self, dataframe_class):
-        self.df_class = dataframe_class
 
-    # a quick method for printing out the filters list
-    def print_filter_list(self):
-        print("Here are your RSS filters:")
+class Session:
+
+    def __init__(self, roster_class):
+        self.roster_class = roster_class
+
+    # a method for printing out the filters list
+    def list_rss_feeds(self):
+        print("Here are the saved RSS feeds you are filtering:")
         dashes = '-' * 120
         print(dashes)
-        print('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'Filter description', 'Last run on:'))
+        print('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
         print(dashes)
-        for i in range(len(self.df_class.df)): # self.df_class.df is the dataframe itself
-            print('{0:<10}{1:40}{2:40}{3}'.format(i,self.df_class.df.iloc[i]['RSS feed name'],self.df_class.df.iloc[i]['Filter description'],self.df_class.df.iloc[i]['Last run']))
-
+        for i in range(len(self.roster_class.roster_loaded)): # self.roster_class.roster_loaded is the loaded JSON file
+            print('{0:<10}{1:40}{2:40}{3}'.format(
+                i,
+                self.roster_class.roster_loaded.iloc[i]['RSS feed name'],
+                self.roster_class.roster_loaded.iloc[i]['URL'],
+                self.roster_class.roster_loaded.iloc[i]['keywords'])
+            )
 
     # this method is the main menu loop. come back here every time something finishes
     def main_menu(self):
-        self.print_filter_list()
         print('\nWhat would you like to do?\n')
         while True:
-            ans = input('[a] Run a filter | [b] Run all filters | [c] Add a filter | [d] Remove a filter | [e] View filters | [f] Change configurations | [g] Exit\n Make a selection >> ')
-            ans_list = ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+            ans = input("""
+            [a] Run all filters | [b] Run one filter | [c] Manage filters | [d] Exit\n Make a selection >> 
+            """)
+            ans_list = ['a', 'b', 'c']
 
             if ans not in ans_list:
                 print("Please select a letter from the options")
 
             elif ans == 'a':
-                self.run_filter_menu()
-
-            elif ans == 'b':
                 self.run_all_filters()
 
+            elif ans == 'b':
+                self.run_filter_menu()
+
             elif ans == 'c':
-                self.add_filter_menu()
+                self.manage_filter_menu()
 
             elif ans == 'd':
-                self.remove_filter_menu()
-
-            elif ans == 'e':
-                self.print_filter_list()
-
-            elif ans == 'f':
-                self.change_configs_menu()
-
-            elif ans == 'g':
-                self.df_class.save_csv()
+                self.roster_class.save_roster()
                 print('Bye!')
                 break
 
-    def run_filter_menu(self):
-        self.print_filter_list()
-        while True:
-            inum = input('OK, which filter would you like to run? Select a filter using the index number on the left.\n'
-                        'you can also type -1 to return to the main menu. >> ')
-            try:
-                inum = int(inum)
-            except ValueError:
-                print("Invalid selection")
-                continue
-            if inum == -1:
-                break
-            elif inum < 0 or inum >= self.df_class.df.shape[0]:
-                print("Invalid selection")
-            else:
-                break
-        while True:
-            days = input('And how many days back would you like to search? >> ')
-            try:
-                days = int(days)
-            except ValueError:
-                print("Invalid selection")
-                continue
-            if int(days) < 0:
-                print('Invalid selection')
-            else:
-                break
-        row = self.df_class.get_row(inum)
-        print(row)
-        rss_parsed = RSSfilter(row[3])
-        rss_parsed.process(days)
-        rss_parsed.filter(row[2])
-        print('Here is what we found:\n')
-        for item in rss_parsed.findings:  # loops through the list of dicts and prints the values
+    def run_filter(self, index_num):
+        rss_parsed = RSSfilter(
+            self.roster_class.roster_loaded[index_num]['RSS feed name'],
+            self.roster_class.roster_loaded[index_num]['URL'],
+            self.roster_class.roster_loaded[index_num]['keywords']
+        )
+        rss_parsed.process()
+        rss_parsed.run_filter()
+        if len(rss_parsed.findings) == 0:
+            print(
+                "Nothing found for these keywords in ",
+                self.roster_class.roster_loaded[index_num]['RSS feed name']
+            )
+            input("Press return to continue...")
+        else:
+            self.report_findings(
+                rss_parsed.findings,
+                self.roster_class.roster_loaded[index_num]['RSS feed name']
+            )
+            self.save_findings(rss_parsed)
+
+    def run_all_filters(self):
+        for i in range(len(self.roster_class.roster_loaded) - 1):
+            self.run_filter(i)
+
+    def report_findings(self, findings, feed_name):
+        if len(findings) == 0:
+            print("Nothing found for these keywords in ", feed_name)
+        else:
+            print("Here's what we found:\n")
+        for item in findings:  # loops through the list of dicts and prints the values
             print(item['title'])
             print(item['link'])
             print(item['summary'])
             print('--------------------------')
-        print('*************************+*****')
-        while True:
-            ans = input('Would you like to save these findings to an HTML file so you can read them later in a browser? (y/n) >> ')
-            ans_list = ['y', 'Y', 'n', 'N']
-            if ans not in ans_list:
-                print('Try that again.')
-            elif ans == 'y' or ans == 'Y':
-                rss_parsed.print_to_html(configurations.save_results_path())
-                print('All set! Your results are at ' + configurations.save_results_path())
-                input('Press any key to return to the main menu...')
-                break
-            elif ans == 'n' or ans == 'N':
-                input('Press any key to return to the main menu...')
-                break
 
+    def save_findings(self, rss_parsed_class):
+        ans = input(
+            'Would you like to save these findings to an HTML file so you can read them later in a browser? (y/n) >> ')
+        ans_list = ['y', 'Y', 'n', 'N']
+        if ans not in ans_list:
+            print('Try that again.')
+        elif ans == 'y' or ans == 'Y':
+            rss_parsed_class.print_to_html(configurations.save_results_path())
+            print('All set! Your results are at ' + configurations.save_results_path())
+            input('Press return to continue...')
+        elif ans == 'n' or ans == 'N':
+            input('Press return to continue...')
+
+  ### UPDATED TO HERE ###
 
     def add_filter_menu(self):
         print("Great! Let's add a filter.\n")

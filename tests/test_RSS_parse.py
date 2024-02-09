@@ -7,7 +7,7 @@ test_link = 'https://techcrunch.com/feed/'
 configs = Configs('config.ini')
 
 days = 8
-test_keywords = 'ChatGPT'
+test_keywords = 'Apple Vision'
 
 
 test_feed = RSSfilter(test_link)              # instantiates the RSSfeed class
@@ -20,7 +20,7 @@ for item in test_processed:                 # loops through the list of dicts an
    print(item['summary'])
    print('--------------------------')
 
-test_searched = test_feed.filter('Yelp')
+test_searched = test_feed.filter('Apple Vision')
 print('**************************')
 for item in test_searched:                 # loops through the list of dicts and prints the values
     print(item['title'])
