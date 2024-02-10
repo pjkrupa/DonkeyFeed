@@ -7,7 +7,7 @@ from main.RSS_parse import RSSfilter
 #           "keywords": [array]
 #           }
 
-with open('../main/RSS feed filters.json', 'r') as f:
+with open('../main/user/RSS feed filters.json', 'r') as f:
     json_data = json.load(f)
 
 for index, i in enumerate(json_data):

@@ -24,15 +24,27 @@ class Roster:
         except FileNotFoundError as e:
             print("Error when saving the file: ", str(e))
 
+    # the ui.py "add rss" method does this
+    def add_rss_feed(self, rss_name, rss_url, rss_keyword_list):
+        new_entry = {
+            "RSS feed name": rss_name,
+            "URL": rss_url,
+            "keywords": rss_keyword_list
+        }
+        self.roster_loaded.append(new_entry)
+        self.save_roster()
+
     # to call this method, you need the index number of the RSS feed and a list of keywords to add as arguments
     def add_keywords(self, index_num, new_keywords):
         for string in new_keywords:
             self.roster_loaded[index_num]['keywords'].append(string)
         self.save_roster()
 
-    # to call this method, you need the index number of the RSS feed and a keyword as arguments
-    def remove_keyword(self, index_num, nix_keyword):
-        self.roster_loaded[index_num]['keywords'].remove(nix_keyword)
+    # to call this method, you need the index number of the RSS feed and a list of keywords as arguments
+    def remove_keywords(self, index_num, nix_keywords):
+        for string in nix_keywords:
+            if string in self.roster_loaded[index_num]['keywords']:
+                self.roster_loaded[index_num].remove(string)
         self.save_roster()
 
     # to call this method, you need the index number of the RSS feed.

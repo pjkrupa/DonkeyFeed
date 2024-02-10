@@ -19,19 +19,20 @@ class Session:
         for i in range(len(self.roster_class.roster_loaded)): # self.roster_class.roster_loaded is the loaded JSON file
             print('{0:<10}{1:40}{2:40}{3}'.format(
                 i,
-                self.roster_class.roster_loaded.iloc[i]['RSS feed name'],
-                self.roster_class.roster_loaded.iloc[i]['URL'],
-                self.roster_class.roster_loaded.iloc[i]['keywords'])
+                self.roster_class.roster_loaded[i]['RSS feed name'],
+                self.roster_class.roster_loaded[i]['URL'],
+                self.roster_class.roster_loaded[i]['keywords'])
             )
 
     # this method is the main menu loop. come back here every time something finishes
     def main_menu(self):
+        self.list_rss_feeds()
         print('\nWhat would you like to do?\n')
         while True:
             ans = input("""
             [a] Run all filters | [b] Run one filter | [c] Manage filters | [d] Exit\n Make a selection >> 
             """)
-            ans_list = ['a', 'b', 'c']
+            ans_list = ['a', 'b', 'c', 'd']
 
             if ans not in ans_list:
                 print("Please select a letter from the options")
@@ -43,12 +44,26 @@ class Session:
                 self.run_filter_menu()
 
             elif ans == 'c':
-                self.manage_filter_menu()
+                self.manage_filters_menu()
 
             elif ans == 'd':
                 self.roster_class.save_roster()
                 print('Bye!')
                 break
+
+    def run_filter_menu(self):
+        self.list_rss_feeds()
+        while True:
+            ans = input("Which one would you like to run? Type -1 to go back. >> ")
+            try:
+                ans = int(ans)
+            except ValueError:
+                print("Invalid selection")
+                continue
+            if ans == -1:
+                break
+            else:
+                self.run_filter(ans)
 
     def run_filter(self, index_num):
         rss_parsed = RSSfilter(
@@ -99,66 +114,111 @@ class Session:
         elif ans == 'n' or ans == 'N':
             input('Press return to continue...')
 
-  ### UPDATED TO HERE ###
-
-    def add_filter_menu(self):
-        print("Great! Let's add a filter.\n")
+    def manage_filters_menu(self):
+        self.list_rss_feeds()
         while True:
-            rss_feed_name = input('What is the title of the RSS feed you would like to filter? >> ')
-            if len(rss_feed_name) > 30:
-                print('Please keep it under 30 characters.')
-            else:
+            print('[a] Add an RSS feed | '
+                  '[b] Remove an RSS feed | '
+                  '[c] Add or remove keywords for a saved RSS feed | '
+                  '[d] Back to main'
+                  )
+            ans_list = ['a', 'b', 'c', 'd']
+            ans = input("What would you like to do? >> ")
+            if ans not in ans_list:
+                print("Try again.")
+            elif ans == 'a':
+                self.add_rss_feed()
+            elif ans == 'b':
+                self.remove_rss_feed()
+            elif ans == 'c':
+                self.change_keywords()
+            elif ans == 'd':
                 break
 
-        while True:
-            filter_description = input('Enter a short description of your filter >> ')
-            if len(filter_description) > 30:
-                    print('Please keep it under 30 characters.')
-            else:
-                break
+    def add_rss_feed(self):
+        rss_feed_name = input('RSS feed name? >> ')
+        rss_feed_url = input('RSS feed URL? >> ')
+        keywords_string = input(
+            'Search keywords? Enter as many as you like, separated by a comma '
+            'and a space (eg: Apple Vision, ChatGPT, Connecticut). The search will return all'
+            'entries containing any of the keywords.'
+        )
+        keywords_list = self.make_list_strs(keywords_string)
+        self.roster_class.add_rss_feed(rss_feed_name, rss_feed_url, keywords_list)
+        input("All done. Press return to continue")
 
-        filter_term = input('What search term would you like to use for your filter? >> ')
-        rss_feed_link = input('And what is the URL for this RSS feed? (use ctrl + shift + v to paste in terminal) >> ')
-        # This calls the method .add_row() on the Dataframe class object self.df_class to modify the database
-        self.df_class.add_row(rss_feed_name, filter_description, filter_term, rss_feed_link)
-        # Calls the method to save the df to a CSV
-        self.df_class.save_csv()
-        input('All set! The new filter has been added to your list. Press any key to continue...\n')
-
-    def remove_filter_menu(self):
-        self.print_filter_list()
+    def remove_rss_feed(self, index_nums):
+        self.list_rss_feeds()
         while True:
-            ans = input('Which filter would you like to remove? Select the index number from the left-hand column\n'
-                        'or type -1 to go back to the main menu >> ')
-            try:
-                ans = int(ans)
-            except ValueError:
-                print("Invalid selection")
-                continue
+            ans = input("Select the index number of the RSS feeds you would like to remove, "
+                        "separated by a comma (eg: 3, 14, 4) or -1 to go back")
+            index_list = []
             if ans == -1:
                 break
-            elif ans < 0 or ans >= self.df_class.df.shape[0]:
-                print("Invalid selection")
             else:
-                self.df_class.delete_row(ans)
-                self.df_class.save_csv()
-                print('The filter has been removed from your list.')
-                input('Press any key to continue...')
+                temp_list = ans.split(',')
+                for item in temp_list:
+                    item.strip()
+                    try:
+                        int(item)
+                    except ValueError:
+                        print("At least one of your entries is not a number")
+                    abs(item)
+                    index_list.append(item)
+            for index in index_list:
+                self.roster_class.remove_rss_feed(index)
+            self.roster_class.save_roster()
+            input("All done, press return to continue...")
+            break
+
+    def make_list_strs(self, string):
+        keywords_list = []
+        temp_list = string.split(',')
+        for item in temp_list:
+            item.strip()
+            keywords_list.append(item)
+        return keywords_list
+
+    def make_list_ints(self, string):
+        pass
+
+    def change_keywords(self):
+        self.list_rss_feeds()
+        while True:
+            rss_feed_index = input("Which RSS filter would you like to change? Select an index number or enter -1 to go back. >> ")
+            if rss_feed_index == -1:
                 break
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            else:
+                try:
+                    int(rss_feed_index)
+                except TypeError:
+                    print("Try again.")
+                while True:
+                    ans_list = ['a', 'b']
+                    ans = input('What would you like to do? [a] add keywords | [b] remove keywords >> ')
+                    if ans not in ans_list:
+                        print("Try again")
+                    elif ans == 'a':
+                        keyword_string = input(
+                            "Enter the search keywords you would like to add separated by a comma. >> "
+                        )
+                        keyword_list = self.make_list_strs(keyword_string)
+                        self.roster_class.add_keywords(rss_feed_index, keyword_list)
+                        input("All done. Press return to continue...")
+                        break
+                    elif ans == 'b':
+                        keyword_string = input(
+                            "Enter the search keywords you would like to remove separated by a comma. >> "
+                        )
+                        keyword_list = self.make_list_strs(keyword_string)
+                        self.roster_class.remove_keywords(rss_feed_index, keyword_list)
+                        input("All done. Press return to continue...")
+                        break
+            ans_list = ['y', 'n']
+            ans = input("Would you like to continue adding or removing keywords? y/n")
+            if ans not in ans_list:
+                print("Try again.")
+            elif ans == 'y':
+                input("Press return to continue")
+            elif ans == 'n':
+                break
