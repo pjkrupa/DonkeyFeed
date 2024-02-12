@@ -1,10 +1,13 @@
 import feedparser as fp
 import os
 import datetime
+from config import Configs
 
+# this class parses an RSS feed, with methods to filter the results and save them to an HTML file
 
 class RSSfilter:
     def __init__(self, rss_feed_name, url, keywords):
+        print(f"Parsing {rss_feed_name}...")
         self.rss_dict = fp.parse(url)          # parses the RSS feed
         self.currentdate = datetime.datetime.now()  # creates a datetime object for comparison later
         self.user_title = rss_feed_name
@@ -41,7 +44,7 @@ class RSSfilter:
 
     def print_to_html(self, save_path):
         date_and_time = self.currentdate.strftime("%Y_%m_%d_%H%M")
-        html_file_path = os.path.join(save_path, date_and_time + '.html')
+        html_file_path = os.path.join(save_path, self.user_title + date_and_time + '.html')
         try:
             with open(html_file_path, 'w') as file:
                 file.write("""<!DOCTYPE html>
@@ -62,7 +65,7 @@ class RSSfilter:
                     file.write("""</body>
                         </html>
                         """)
-            return True
+            return html_file_path
         except Exception as e:
             print(f'Error writing to {html_file_path}: {e}')
 

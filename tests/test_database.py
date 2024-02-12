@@ -1,5 +1,5 @@
 from main.config import Configs
-from main.database import Dataframe
+from main.rss_roster import Dataframe
 test_feed_name = "Techcrunch"
 test_filter_description = "ChatGPT search"
 test_filter_term = "ChatGPT"

@@ -1,5 +1,5 @@
 from RSS_parse import RSSfilter
-from database import Roster
+from rss_roster import Roster
 from config import Configs
 from ui import Session
 
