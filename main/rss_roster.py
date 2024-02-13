@@ -1,5 +1,6 @@
 import json
 import os
+from styles import Printer
 
 # the roster is the JSON file where all the RSS feeds and their keywords are saved.
 # this class loads and manages the roster.
@@ -10,6 +11,7 @@ class Roster:
         # defines the path where the RSS roster is located
         self.roster_path = os.path.join(roster_path, 'RSS feed filters.json')
         self.roster_loaded = self.load()
+        self.printer = Printer()
 
     # loads the roster
     def load(self):
@@ -43,9 +45,10 @@ class Roster:
 
     # to call this method, you need the index number of the RSS feed and a list of keywords as arguments
     def remove_keywords(self, index_num, nix_keywords):
-        for string in nix_keywords:
-            if string in self.roster_loaded[index_num]['keywords']:
-                self.roster_loaded[index_num].remove(string)
+        print(self.roster_loaded[index_num]['keywords'])
+        new_list = [item for item in self.roster_loaded[index_num]['keywords'] if item not in nix_keywords]
+        print(new_list)
+        self.roster_loaded[index_num]['keywords'] = new_list
 
     # to call this method, you need the index number of the RSS feed.
     def remove_rss_feed(self, index_num):

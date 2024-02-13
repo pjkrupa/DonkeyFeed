@@ -1,5 +1,4 @@
-import json
-from main.RSS_parse import RSSfilter
+
 
 # data structure is {
 #           "RSS feed name": "<string>",
@@ -7,35 +6,16 @@ from main.RSS_parse import RSSfilter
 #           "keywords": [array]
 #           }
 
-with open('../main/user/RSS feed filters.json', 'r') as f:
-    json_data = json.load(f)
+list1 = ["ActivityPub", "test1", "test2", "test3", "test4", "test5"]
+list2 = ["test2", "test3", "test4"]
 
-for index, i in enumerate(json_data):
-    print(index, ": ", i['URL'], " ---- ", i['keywords'])
+def remove_keywords(old_list, remove_list):
+    new_list = [item for item in old_list if item not in remove_list]
+    print(new_list)
+    return new_list
 
-new_entry = {
-    "RSS feed name": "Hacker News",
-    "URL": "https://news.ycombinator.com/rss",
-    "keywords": [
-        "Chat GPT",
-        "LLM",
-        "Apple Vision"
-    ]
-}
+remove_keywords(list1, list2)
 
-json_data.append(new_entry)
-json_data[2]['keywords'].append('Sam Altman')
-
-for index, i in enumerate(json_data):
-    print(index, ": ", i['URL'], " ---- ", i['keywords'])
-
-test_parsed = RSSfilter(json_data[0]['RSS feed name'], json_data[0]['URL'], json_data[0]['keywords'])
-
-for entry in test_parsed.rss_dict.entries:
-    print(entry['title'])
-    print(entry['link'])
-    print(entry['summary'])
-    print("------------------------------")
 
 
 

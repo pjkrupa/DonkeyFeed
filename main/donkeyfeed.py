@@ -8,7 +8,8 @@ configurations = Configs('config.ini')
 # plus a number of methods for doing stuff with it.
 roster = Roster(configurations.rss_filters_path())
 
-print('Hello! Welcome to DonkeyFeed, the worst RSS filter!\n')
+print('Hello! Welcome to DonkeyFeed, the worst RSS filter!')
+input('Press return to get on with it...')
 main_loop = Session(roster)
 main_loop.main_menu()
 

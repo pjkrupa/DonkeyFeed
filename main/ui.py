@@ -1,5 +1,6 @@
 import webbrowser
 import os
+from command_prompt import Command
 from rss_roster import Roster
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
@@ -17,6 +18,43 @@ class Session:
         self.printer = Printer()
         self.prompter = Prompter()
         self.root_directory = self.get_root()
+
+    def main_loop(self):
+        while True:
+            prompt = Command(self.roster)
+            if prompt.command == 'run':
+                self.run_filter(prompt.index_list)
+
+            elif prompt.command == 'run special':
+                self.run_special(prompt.index, prompt.keyword_list)
+
+            elif prompt.command == 'run all':
+                self.run_all_filters()
+
+            elif prompt.command == 'new':
+                self.add_rss_feed(prompt.new_title, prompt.new_url, prompt.keyword_list)
+
+            elif prompt.command == 'delete':
+                for item in prompt.index_list:
+                    self.remove_rss_feed(item)
+
+            elif prompt.command == 'list':
+                self.list_rss_feeds()
+
+            elif prompt.command == 'exit':
+                break
+
+            elif prompt.command == 'help':
+                self.help()
+
+    def yesno(self, question):
+        while True:
+            ans_list = ['y', 'n']
+            ans = self.prompter.green(question + ' >> ').lower()
+            if ans not in ans_list:
+                self.printer.red('Try again.')
+            else:
+                return ans
 
     def get_root(self):
         script_path = os.path.realpath(__file__)
@@ -40,34 +78,6 @@ class Session:
                 self.roster.roster_loaded[i]['keywords'][:30])
             )
         self.printer.blue(dashes)
-
-    # this method is the main menu loop. come back here every time something finishes
-    def main_menu(self):
-        while True:
-            self.list_rss_feeds()
-            print('\nWhat would you like to do?')
-            ans = self.prompter.green("""
-[a] Run all filters | [b] Run one filter | [c] Manage filters | [d] Exit\n Make a selection >> 
-    """
-                        )
-            ans_list = ['a', 'b', 'c', 'd']
-
-            if ans not in ans_list:
-                self.printer.red("Please select a letter from the options")
-
-            elif ans == 'a':
-                self.run_all_filters()
-
-            elif ans == 'b':
-                self.run_filter_menu()
-
-            elif ans == 'c':
-                self.manage_filters_menu()
-
-            elif ans == 'd':
-                self.roster.save()
-                print('Bye!')
-                break
 
     def run_filter_menu(self):
         while True:
@@ -105,6 +115,32 @@ class Session:
             )
             self.save_findings(rss_parsed)
 
+    def run_special(self, index, keyword_list):
+        rss_parsed = RSSfilter(
+            self.roster.roster_loaded[index]['RSS feed name'],
+            self.roster.roster_loaded[index]['URL'],
+            keyword_list
+        )
+        rss_parsed.process()
+        rss_parsed.run_filter()
+        if len(rss_parsed.findings) == 0:
+            print(
+                "Nothing found for these keywords in ",
+                self.roster.roster_loaded[index]['RSS feed name']
+            )
+            self.prompter.green("Press return to continue...")
+            self.spacer()
+        else:
+            self.report_findings(
+                rss_parsed.findings,
+                self.roster.roster_loaded[index]['RSS feed name']
+            )
+            self.save_findings(rss_parsed)
+        if self.yesno('Would you like to save these keywords to your RSS filter? >> ') == 'y':
+            self.add_keywords(index, keyword_list)
+
+
+
     def run_all_filters(self):
         for i in range(len(self.roster.roster_loaded)):
             self.run_filter(i)
@@ -123,113 +159,41 @@ class Session:
             print('--------------------------')
 
     def save_findings(self, rss_parsed_class):
-        while True:
-            ans = self.prompter.green(
-                'Would you like to save these findings to an HTML file '
-                'so you can read them later in a browser? (y/n) >> '
-            )
-            ans_list = ['y', 'n',]
-            if ans not in ans_list:
-                self.printer.red('Try that again.')
-            elif ans == 'y':
-                html_path = rss_parsed_class.print_to_html(configurations.save_results_path())
-                self.printer.green('All set! Your results are at ' + html_path)
-                while True:
-                    yn = self.prompter.green('Would you like to view them in your browser now?')
-                    if yn not in ans_list:
-                        self.printer.red("Try that again.")
-                    elif yn == 'n':
-                        break
-                    elif yn == 'y':
-                        fullpath = os.path.join(self.root_directory, html_path)
-                        fullpath = os.path.normpath(fullpath)
-                        webbrowser.open('file://' + fullpath)
-                        break
-                self.prompter.green('Press return to continue...')
-                break
-            elif ans == 'n':
-                self.prompter.green('Press return to continue...')
-                self.spacer()
-                break
+        y_n = self.yesno('Would you like to save these findings to an HTML file '
+                         'so you can read them later in a browser? (y/n)')
+        if y_n == 'y':
+            html_path = rss_parsed_class.print_to_html(configurations.save_results_path())
+            self.printer.green('All set! Your results are at ' + html_path)
+            y_n = self.yesno('Would you like to view them in your browser now?')
+            if y_n == 'y':
+                fullpath = os.path.join(self.root_directory, html_path)
+                fullpath = os.path.normpath(fullpath)
+                webbrowser.open('file://' + fullpath)
+            self.prompter.green('Press return to continue...')
+        else:
+            self.prompter.green('Press return to continue...')
+            self.spacer()
 
-
-    def manage_filters_menu(self):
-        self.list_rss_feeds()
-        while True:
-            self.printer.green('[a] Add an RSS feed | '
-                  '[b] Remove an RSS feed | '
-                  '[c] Add or remove keywords for a saved RSS feed | '
-                  '[d] Back to main'
-                  )
-            ans_list = ['a', 'b', 'c', 'd']
-            ans = self.prompter.green("What would you like to do? >> ")
-            if ans not in ans_list:
-                print("Try again.")
-            elif ans == 'a':
-                self.add_rss_feed()
-            elif ans == 'b':
-                self.remove_rss_feed()
-            elif ans == 'c':
-                self.change_keywords()
-            elif ans == 'd':
-                break
-
-    def add_rss_feed(self):
-        rss_feed_name = input('RSS feed name? >> ')
-        rss_feed_url = input('RSS feed URL? >> ')
-        keywords_string = self.prompter.green(
-            'Which search keywords would you like to add? Enter as many as you like, separated by a comma '
-            'and a space (eg: Apple Vision, ChatGPT, Connecticut). The search will return all'
-            ' entries containing any of the keywords. >> '
-        )
-        keywords_list = self.make_list_strs(keywords_string)
-        self.roster.add_rss_feed(rss_feed_name, rss_feed_url, keywords_list)
+    def add_rss_feed(self, new_title, new_url, keyword_list):
+        self.roster.add_rss_feed(new_title, new_url, keyword_list)
         self.roster.save()
         self.prompter.green("All done. Press return to continue.")
         self.spacer()
 
-    def remove_rss_feed(self):
-        self.list_rss_feeds()
-        while True:
-            ans = self.prompter.green("Select the index number of the RSS feeds you would like to remove, "
-                        "separated by a comma (eg: 3, 14, 4) or -1 to go back >> ")
-            index_list = self.make_list_ints(ans)
-            if index_list == -1:
-                break
-            elif not index_list:
-                continue
-            elif isinstance(index_list, list):
-                for index in index_list:
-                    self.roster.remove_rss_feed(index)
-                self.roster.save()
-                self.prompter.green("All done, press return to continue...")
-                self.spacer()
-                break
+    def remove_rss_feed(self, index_list):
+        y_n = self.yesno('Are you sure you want to delete? y/n')
+        if y_n == 'y':
+            for index in index_list:
+                self.roster.remove_rss_feed(index)
+            self.roster.save()
+            self.prompter.green("All done, press return to continue...")
+            self.spacer()
 
-    def make_list_ints(self, string):
-        index_list = []
-        if string == "-1":
-            return -1
-        else:
-            temp_list = string.split(',')
-            for item in temp_list:
-                item = item.strip()
-                try:
-                    item = abs(int(item))
-                    index_list.append(int(item))
-                except ValueError:
-                    self.printer.red("At least one of your entries is not a number.")
-                    return False
-                index_list.sort(reverse=True)
-            return index_list
+    def add_keywords(self, index, keywords_list):
+        pass
 
-    def make_list_strs(self, string):
-        keywords_list = []
-        temp_list = string.split(',')
-        for item in temp_list:
-            item.strip()
-            keywords_list.append(item)
-        return keywords_list
+    def remove_keywords(self, index, keywords_list):
+        pass
 
     def change_keywords(self):
         self.list_rss_feeds()
@@ -239,13 +203,15 @@ class Session:
                 break
             else:
                 try:
-                    int(rss_feed_index)
+                    rss_feed_index = int(rss_feed_index)
                 except TypeError:
                     self.printer.red("Try again.")
                 while True:
-                    ans_list = ['a', 'b']
-                    ans = self.prompter.green('What would you like to do? [a] add keywords | [b] remove keywords >> ')
-                    if ans not in ans_list:
+                    ans_list = ['a', 'b', 'c']
+                    ans = self.prompter.green('What would you like to do? [a] add keywords | [b] remove keywords [c] back >> ')
+                    if ans == 'c':
+                        break
+                    elif ans not in ans_list:
                         self.printer.red("Try again")
                     elif ans == 'a':
                         keyword_string = self.prompter.green(
@@ -275,5 +241,12 @@ class Session:
             elif ans == 'n':
                 break
 
+    def help(self):
+        pass
+
     def spacer(self):
         self.printer.blue('\n----------------------------')
+
+
+
+

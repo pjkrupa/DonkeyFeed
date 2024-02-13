@@ -56,7 +56,7 @@ class RSSfilter:
                         <p><h1>{feed_title}</h1></p>
                         <p><h2>Here are your search results for today:</h2></p>
                         <p>You filtered for mentions of the these search terms: {search_terms} ... on this day: {date}.</p>
-                       """.format(feed_title=self.feed_title, search_terms=self.search_terms, date=date_and_time))
+                       """.format(feed_title=self.user_title, search_terms=self.search_terms, date=date_and_time))
                 for item in self.findings:
                     file.write('<h3>{title}</h3>'.format(title=item['title']))
                     file.write('<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))
