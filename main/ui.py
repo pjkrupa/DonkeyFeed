@@ -9,9 +9,6 @@ from RSS_parse import RSSfilter
 from config import Configs
 configurations = Configs('config.ini')
 
-# class for a DonkeyFeed session.
-# there's a method for each menu interaction
-
 class Session:
 
     # grabs the roster
@@ -174,7 +171,53 @@ class Session:
         self.roster.save()
 
     def help(self):
-        pass
+        self.printer.yellow("""
+Here's a rundown of DonkeyFeed commands and how to use them:
+
+list                                Lists saved RSS filters, with the index numbers that are used to run them. 
+
+run <index numbers>                 Runs an RSS filter, using index numbers. You can run a single feed filter (eg: 'run 2') 
+                                    or multiple feed filters at once (eg: 'run 1, 2, 7, 19'). Makes sure the index numbers
+                                    are separated by commas. You will be asked after each filter runs if you want
+                                    to save the results or view them in a browser.
+                                    
+run all                             The nuclear option. This runs every filter in your RSS filter roster, saves the
+                                    results to an HTML file, and opens it in your default browser. A quick and easy way 
+                                    to run all your saved feed filters at once.
+                                    
+run special <index number>          This is for running a saved RSS feed with new keywords that you haven't saved yet. 
+                                    This command can only run one filter at a time (eg: 'run special 5', where '5' is
+                                    the index number of the feed you want to run). You will then be prompted to enter 
+                                    your search keywords separated by commas. After running the filter, you will have the 
+                                    option to add the new keywords to your saved filter.
+                                    
+new <filter name>                   Saves a new RSS feed filter to the roster. (eg: 'new TechCrunch'). You will then be
+                                    prompted for the URL address of the RSS feed and the keywords for the filter,
+                                    separated by commas.
+                                    
+delete <index numbers>              Deletes one or more saved feed filters from the roster, with multiple index numbers
+                                    being separated by commas. (eg: 'delete 5, 8, 12')
+                                    
+add keywords <index number>         Adds one or more keywords to a saved feed filter. (eg: 'add keywords 8' where '8' is
+                                    the index number of the feed filter where you want to add the keywords.) You will
+                                    then be prompted to enter a list of new keywords, separated by commas.
+
+remove keywords <index number>      Same as 'add keywords,' but for removing keywords from a saved feed filter. 
+                                
+upload <path>                       This is for uploading a .CSV file containing your RSS feeds for filtering, where <path>
+                                    is the path on your hard drive of the .CSV file. The file should have the following format:
+                                    -------------------------------------------------------------------------------------------
+                                    Column1             Column2         Column3         Column4         ColumnN+1     
+                                    <RSS feed name>     <URL>           <keyword>       <keyword>       <keyword>
+                                    TechCrunch          https://tech..  ChatGPT         OpenAI          Microsoft
+                                    
+                                    or as another example, if you're doing a text file with comma separated values:    
+                                    <RSS feed name>,<URL>,<keyword>,<keyword>,<keyword>,...
+                                    TechCrunch,https://techcrunch.com/feed, ChatGPT,OpenAI,Microsoft,...
+                                    (You can also save an RSS feed with a URL and add keywords later.)
+
+exit                                Pretty self-explanatory IMO.                                                           
+        """)
 
     def spacer(self):
         self.printer.blue('\n----------------------------')
@@ -232,6 +275,9 @@ class Session:
 
             elif prompt.command == 'help':
                 self.help()
+
+            elif prompt.command == 'readme':
+                self.printer.red("Sorry, haven't finished it yet!!")
 
 
 

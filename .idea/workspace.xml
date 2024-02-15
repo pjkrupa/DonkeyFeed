@@ -4,20 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho.">
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/Peter Krupa dot lol2024_02_15_0912.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1217.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1220.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1222.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1235.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1237.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1238.html" afterDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/RSS_parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/RSS_parse.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/command_prompt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/donkeyfeed.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/donkeyfeed.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/ui.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/user/RSS feed filters.json" beforeDir="false" afterPath="$PROJECT_DIR$/main/user/RSS feed filters.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,7 +197,15 @@
       <option name="project" value="LOCAL" />
       <updated>1707845103605</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters">
+      <option name="closed" value="true" />
+      <created>1707997372484</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1707997372484</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -235,7 +232,8 @@
     <MESSAGE value="got the 'run feed filter' part working" />
     <MESSAGE value="fixed some UI problems, added color" />
     <MESSAGE value="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho." />
-    <option name="LAST_COMMIT_MESSAGE" value="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho." />
+    <MESSAGE value="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters" />
+    <option name="LAST_COMMIT_MESSAGE" value="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

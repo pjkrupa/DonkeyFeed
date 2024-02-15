@@ -84,6 +84,9 @@ class Command:
         elif response.lower().startswith('list'):
             self.command = 'list'
 
+        elif response.lower().startswith('readme'):
+            self.command = 'readme'
+
         elif response.lower().startswith('exit'):
             self.command = 'exit'
 
