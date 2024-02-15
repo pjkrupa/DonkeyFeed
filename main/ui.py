@@ -1,6 +1,8 @@
 import webbrowser
 import os
+import datetime
 from command_prompt import Command
+import csv
 from rss_roster import Roster
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
@@ -19,42 +21,16 @@ class Session:
         self.prompter = Prompter()
         self.root_directory = self.get_root()
 
-    def main_loop(self):
-        while True:
-            prompt = Command(self.roster)
-            if prompt.command == 'run':
-                self.run_filter(prompt.index_list)
-
-            elif prompt.command == 'run special':
-                self.run_special(prompt.index, prompt.keyword_list)
-
-            elif prompt.command == 'run all':
-                self.run_all_filters()
-
-            elif prompt.command == 'new':
-                self.add_rss_feed(prompt.new_title, prompt.new_url, prompt.keyword_list)
-
-            elif prompt.command == 'delete':
-                for item in prompt.index_list:
-                    self.remove_rss_feed(item)
-
-            elif prompt.command == 'list':
-                self.list_rss_feeds()
-
-            elif prompt.command == 'exit':
-                break
-
-            elif prompt.command == 'help':
-                self.help()
-
     def yesno(self, question):
         while True:
             ans_list = ['y', 'n']
             ans = self.prompter.green(question + ' >> ').lower()
             if ans not in ans_list:
                 self.printer.red('Try again.')
+            elif ans == 'n':
+                return False
             else:
-                return ans
+                return True
 
     def get_root(self):
         script_path = os.path.realpath(__file__)
@@ -79,25 +55,13 @@ class Session:
             )
         self.printer.blue(dashes)
 
-    def run_filter_menu(self):
-        while True:
-            self.list_rss_feeds()
-            ans = self.prompter.green("Which feed filter would you like to run? Type -1 to go back. >> ")
-            try:
-                ans = int(ans)
-            except ValueError:
-                self.printer.red("Invalid selection")
-                continue
-            if ans == -1:
-                break
-            else:
-                self.run_filter(ans)
-
-    def run_filter(self, index_num):
+    def run_filter(self, index_num, keywords=None):
+        if keywords is None:
+            keywords = self.roster.roster_loaded[index_num]['keywords']
         rss_parsed = RSSfilter(
             self.roster.roster_loaded[index_num]['RSS feed name'],
             self.roster.roster_loaded[index_num]['URL'],
-            self.roster.roster_loaded[index_num]['keywords']
+            keywords
         )
         rss_parsed.process()
         rss_parsed.run_filter()
@@ -106,73 +70,87 @@ class Session:
                 "Nothing found for these keywords in ",
                 self.roster.roster_loaded[index_num]['RSS feed name']
             )
-            self.prompter.green("Press return to continue...")
-            self.spacer()
         else:
-            self.report_findings(
-                rss_parsed.findings,
-                self.roster.roster_loaded[index_num]['RSS feed name']
-            )
-            self.save_findings(rss_parsed)
+            return rss_parsed.findings, rss_parsed.keywords_found
 
-    def run_special(self, index, keyword_list):
-        rss_parsed = RSSfilter(
-            self.roster.roster_loaded[index]['RSS feed name'],
-            self.roster.roster_loaded[index]['URL'],
-            keyword_list
-        )
-        rss_parsed.process()
-        rss_parsed.run_filter()
-        if len(rss_parsed.findings) == 0:
-            print(
-                "Nothing found for these keywords in ",
-                self.roster.roster_loaded[index]['RSS feed name']
-            )
-            self.prompter.green("Press return to continue...")
-            self.spacer()
-        else:
-            self.report_findings(
-                rss_parsed.findings,
-                self.roster.roster_loaded[index]['RSS feed name']
-            )
-            self.save_findings(rss_parsed)
-        if self.yesno('Would you like to save these keywords to your RSS filter? >> ') == 'y':
-            self.add_keywords(index, keyword_list)
+    def upload(self, path):
+        try:
+            with open(path) as csvfile:
+                csvreader = csv.reader(csvfile)
+                for row in csvreader:
+                    row = [item.strip() for item in row]
+                    if len(row) >= 2:
+                        title = row[0]
+                        url = row[1]
+                        del row[0:2]
+                        self.roster.add_rss_feed(title, url, row)
+        except FileNotFoundError:
+            self.printer.red('File not found.')
+        self.roster.save()
+        self.prompter.green('All done. Press <return> to continue.')
 
+    def save_to_html(self, findings, keywords_found):
+        keywords_found = list(set(keywords_found))
+        save_path = configurations.save_results_path()
+        date_and_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M")
+        html_file_path = os.path.join(save_path, 'everything_' + date_and_time + '.html')
+        try:
+            with open(html_file_path, 'w') as file:
+                file.write("""<!DOCTYPE html>
+                                <html>
+                                <head>
+                                 <title>DonkeyFeed search results</title>
+                                 </head>
+                                <body>
+                                <p><h1>Search terms found: {search_terms}</h1></p>
+                                <p><h2>Here are your search results for today:</h2></p>
+                                <p>You ran this search on {date}.</p>
+                               """.format(search_terms=keywords_found,
+                                          date=date_and_time))
+                for item in findings:
+                    file.write('<h3>{title}</h3>'.format(title=item['title']))
+                    file.write(
+                        '<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))
+                    file.write('<p>{summary}</p>'.format(summary=item['summary']))
+                    file.write('<p>---------------------------------</p>')
+                    file.write("""</body>
+                                </html>
+                                """)
+            return html_file_path
+        except Exception as e:
+            print(f'Error writing to {html_file_path}: {e}')
 
-
+    # the idea of this being a separate function is to run through
+    # all the filters, save them, and open the findings without pause
     def run_all_filters(self):
+        full_results = []
+        all_keywords_found = []
         for i in range(len(self.roster.roster_loaded)):
-            self.run_filter(i)
+            results = self.run_filter(i)
+            if results is not None:
+                findings, keywords_found = results
+                full_results.extend(findings)
+                all_keywords_found.extend(keywords_found)
+        path = self.save_to_html(full_results, all_keywords_found)
+        self.open_findings(path)
 
-    def report_findings(self, findings, feed_name):
+    def report_findings(self, findings, keywords, feed_name):
         if len(findings) == 0:
             print("Nothing found for these keywords in ", feed_name)
             self.spacer()
-
         else:
-            print("Here's what we found:\n")
+            print("Results were found for the following search terms:\n")
+            print(keywords)
         for item in findings:  # loops through the list of dicts and prints the values
             self.printer.magenta(item['title'])
             print(item['link'])
             self.printer.yellow(item['summary'])
             print('--------------------------')
 
-    def save_findings(self, rss_parsed_class):
-        y_n = self.yesno('Would you like to save these findings to an HTML file '
-                         'so you can read them later in a browser? (y/n)')
-        if y_n == 'y':
-            html_path = rss_parsed_class.print_to_html(configurations.save_results_path())
-            self.printer.green('All set! Your results are at ' + html_path)
-            y_n = self.yesno('Would you like to view them in your browser now?')
-            if y_n == 'y':
-                fullpath = os.path.join(self.root_directory, html_path)
-                fullpath = os.path.normpath(fullpath)
-                webbrowser.open('file://' + fullpath)
-            self.prompter.green('Press return to continue...')
-        else:
-            self.prompter.green('Press return to continue...')
-            self.spacer()
+    def open_findings(self, html_path):
+        fullpath = os.path.join(self.root_directory, html_path)
+        fullpath = os.path.normpath(fullpath)
+        webbrowser.open('file://' + fullpath)
 
     def add_rss_feed(self, new_title, new_url, keyword_list):
         self.roster.add_rss_feed(new_title, new_url, keyword_list)
@@ -181,71 +159,79 @@ class Session:
         self.spacer()
 
     def remove_rss_feed(self, index_list):
-        y_n = self.yesno('Are you sure you want to delete? y/n')
-        if y_n == 'y':
+        if self.yesno('Are you sure you want to delete? y/n'):
+            index_list.sort(reverse=True)
             for index in index_list:
                 self.roster.remove_rss_feed(index)
             self.roster.save()
-            self.prompter.green("All done, press return to continue...")
-            self.spacer()
 
-    def add_keywords(self, index, keywords_list):
-        pass
+    def add_keywords(self, index, keyword_list):
+        self.roster.add_keywords(index, keyword_list)
+        self.roster.save()
 
-    def remove_keywords(self, index, keywords_list):
-        pass
-
-    def change_keywords(self):
-        self.list_rss_feeds()
-        while True:
-            rss_feed_index = self.prompter.green("Which RSS filter would you like to change? Select an index number or enter -1 to go back. >> ")
-            if rss_feed_index == -1:
-                break
-            else:
-                try:
-                    rss_feed_index = int(rss_feed_index)
-                except TypeError:
-                    self.printer.red("Try again.")
-                while True:
-                    ans_list = ['a', 'b', 'c']
-                    ans = self.prompter.green('What would you like to do? [a] add keywords | [b] remove keywords [c] back >> ')
-                    if ans == 'c':
-                        break
-                    elif ans not in ans_list:
-                        self.printer.red("Try again")
-                    elif ans == 'a':
-                        keyword_string = self.prompter.green(
-                            "Enter the search keywords you would like to add separated by a comma. >> "
-                        )
-                        keyword_list = self.make_list_strs(keyword_string)
-                        self.roster.add_keywords(rss_feed_index, keyword_list)
-                        self.roster.save()
-                        self.prompter.green("All done. Press return to continue...")
-                        break
-                    elif ans == 'b':
-                        keyword_string = self.prompter.green(
-                            "Enter the search keywords you would like to remove separated by a comma. >> "
-                        )
-                        keyword_list = self.make_list_strs(keyword_string)
-                        self.roster.remove_keywords(rss_feed_index, keyword_list)
-                        self.roster.save()
-                        self.prompter.green("All done. Press return to continue...")
-                        break
-            ans_list = ['y', 'n']
-            ans = self.prompter.green("Would you like to continue adding or removing keywords? y/n")
-            if ans not in ans_list:
-                self.printer.red("Try again.")
-            elif ans == 'y':
-                self.prompter.green("Press return to continue")
-                self.spacer()
-            elif ans == 'n':
-                break
+    def remove_keywords(self, index, keyword_list):
+        self.roster.remove_keywords(index, keyword_list)
+        self.roster.save()
 
     def help(self):
         pass
 
     def spacer(self):
         self.printer.blue('\n----------------------------')
+
+    def main_loop(self):
+        while True:
+            prompt = Command(self.roster)
+
+            if prompt.command == 'run':
+                for index in prompt.index_list:
+                    results = self.run_filter(index)
+                    if results is not None:
+                        findings, keywords_found = results
+                        self.report_findings(findings, keywords_found, self.roster.roster_loaded[index]['RSS feed name'])
+                        if self.yesno('Do you want to save these results?'):
+                            path = self.save_to_html(findings, keywords_found)
+                            if self.yesno('Do you want to view the results in a browser?'):
+                                self.open_findings(path)
+
+            elif prompt.command == 'run special':
+                results = self.run_filter(prompt.index, prompt.keyword_list)
+                if results is not None:
+                    findings, keywords_found = results
+                    if self.yesno('Do you want to save these results? >> '):
+                        path = self.save_to_html(findings, keywords_found)
+                        if self.yesno('Do you want to view the results in a browser? >> '):
+                            self.open_findings(path)
+                        if self.yesno('Do you want to save these keywords to your filter? >> '):
+                            self.roster.add_keywords(prompt.index, prompt.keyword_list)
+                            self.printer.green('All set!\n')
+
+            elif prompt.command == 'run all':
+                self.run_all_filters()
+
+            elif prompt.command == 'new':
+                self.add_rss_feed(prompt.new_title, prompt.new_url, prompt.keyword_list)
+
+            elif prompt.command == 'delete':
+                self.remove_rss_feed(prompt.index_list)
+
+            elif prompt.command == 'add keywords':
+                self.add_keywords(prompt.index, prompt.keyword_list)
+
+            elif prompt.command == 'remove keywords':
+                self.remove_keywords(prompt.index, prompt.keyword_list)
+
+            elif prompt.command == 'list':
+                self.list_rss_feeds()
+
+            elif prompt.command == 'upload':
+                self.upload(prompt.csv_path)
+
+            elif prompt.command == 'exit':
+                break
+
+            elif prompt.command == 'help':
+                self.help()
 
 
 
