@@ -3,7 +3,13 @@ from rss_roster import Roster
 from config import Configs
 from ui import Session
 from styles import Printer
+import os
+
 printer = Printer()
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(current_directory)
+
 configurations = Configs('config.ini')
 # this line instantiates a class that includes the dataframe pull from the main CSV file
 # plus a number of methods for doing stuff with it.

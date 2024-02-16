@@ -23,7 +23,6 @@ import validators
 # - exit
 # - help
 
-
 class Command:
     def __init__(self, roster_class):
         self.all_commands = [
