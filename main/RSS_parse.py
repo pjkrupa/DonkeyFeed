@@ -1,7 +1,4 @@
 import feedparser as fp
-import os
-import datetime
-from config import Configs
 
 # this class parses an RSS feed and filters the results, searching for keywords
 # and returning results along with keywords found

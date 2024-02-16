@@ -7,7 +7,7 @@ from styles import Printer
 
 class Roster:
 
-    def __init__(self, roster_path):
+    def __init__(self):
         # defines the path where the RSS roster is located
         self.roster_path = Path(__file__).parent / 'user' / 'RSS feed filters.json'
         self.roster_loaded = self.load()

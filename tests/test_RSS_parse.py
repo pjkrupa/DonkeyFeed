@@ -1,10 +1,8 @@
 from main.RSS_parse import RSSfilter
-from main.config import Configs
 
 # test_link = 'https://ecf.ndb.uscourts.gov/cgi-bin/rss_outside.pl'
 test_link = 'https://techcrunch.com/feed/'
 
-configs = Configs('config.ini')
 
 days = 8
 test_keywords = 'Apple Vision'

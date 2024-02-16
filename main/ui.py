@@ -138,8 +138,9 @@ class Session:
             print('--------------------------')
 
     def open_findings(self, html_path):
-        fullpath = os.path.join(self.root_directory, html_path)
+        fullpath = os.path.join(self.root, html_path)
         fullpath = os.path.normpath(fullpath)
+        print(fullpath)
         webbrowser.open('file://' + fullpath)
 
     def add_rss_feed(self, new_title, new_url, keyword_list):
