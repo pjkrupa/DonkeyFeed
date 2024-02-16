@@ -4,7 +4,7 @@ DonkeyFeed is a simple tool for filtering RSS feeds based on keywords. It lets y
 
 ## Installation
 
-Unzip the package and place the DonkeyFeed folder anywhere on your hard drive.
+Honestly haven't figured it out yet, but check back in a week.
 
 ## Running DonkeyFeed
 
