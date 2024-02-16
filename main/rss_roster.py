@@ -1,5 +1,5 @@
 import json
-import os
+from pathlib import Path
 from styles import Printer
 
 # the roster is the JSON file where all the RSS feeds and their keywords are saved.
@@ -9,7 +9,7 @@ class Roster:
 
     def __init__(self, roster_path):
         # defines the path where the RSS roster is located
-        self.roster_path = os.path.join(roster_path, 'RSS feed filters.json')
+        self.roster_path = Path(__file__).parent / 'user' / 'RSS feed filters.json'
         self.roster_loaded = self.load()
         self.printer = Printer()
 

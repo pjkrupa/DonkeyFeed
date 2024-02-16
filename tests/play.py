@@ -1,20 +1,14 @@
+from pathlib import Path
+import datetime
 
+root = Path(__file__).parent
+date_and_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M")
 
-# data structure is {
-#           "RSS feed name": "<string>",
-#           "URL": "<string>",
-#           "keywords": [array]
-#           }
+string = date_and_time + '_' + 'test.txt'
+save_path = root / string
 
-list1 = ["ActivityPub", "test1", "test2", "test3", "test4", "test5"]
-list2 = ["test2", "test3", "test4"]
-
-def remove_keywords(old_list, remove_list):
-    new_list = [item for item in old_list if item not in remove_list]
-    print(new_list)
-    return new_list
-
-remove_keywords(list1, list2)
+with open(save_path, 'w') as f:
+    f.write('Lets see if this works.')
 
 
 

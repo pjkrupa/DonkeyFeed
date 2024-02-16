@@ -1,17 +1,12 @@
 import webbrowser
 import os
+from pathlib import Path
 import datetime
 from command_prompt import Command
 import csv
 from rss_roster import Roster
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
-from config import Configs
-
-current_directory = os.path.dirname(os.path.realpath(__file__))
-os.chdir(current_directory)
-
-configurations = Configs('config.ini')
 
 class Session:
 
@@ -20,7 +15,7 @@ class Session:
         self.roster = roster
         self.printer = Printer()
         self.prompter = Prompter()
-        self.root_directory = self.get_root()
+        self.root = Path(__file__).parent
 
     def yesno(self, question):
         while True:
@@ -32,12 +27,6 @@ class Session:
                 return False
             else:
                 return True
-
-    def get_root(self):
-        script_path = os.path.realpath(__file__)
-        root_directory = os.path.dirname(script_path)
-        root_directory = os.path.normpath(root_directory)
-        return root_directory
 
     # a method for printing out the roster
     def list_rss_feeds(self):
@@ -92,11 +81,11 @@ class Session:
 
     def save_to_html(self, findings, keywords_found):
         keywords_found = list(set(keywords_found))
-        save_path = configurations.save_results_path()
         date_and_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M")
-        html_file_path = os.path.join(save_path, 'everything_' + date_and_time + '.html')
+        file_name = date_and_time + '.html'
+        save_path = self.root / 'user' / 'search_results' / file_name
         try:
-            with open(html_file_path, 'w') as file:
+            with open(save_path, 'w') as file:
                 file.write("""<!DOCTYPE html>
                                 <html>
                                 <head>
@@ -117,9 +106,9 @@ class Session:
                     file.write("""</body>
                                 </html>
                                 """)
-            return html_file_path
+            return save_path
         except Exception as e:
-            print(f'Error writing to {html_file_path}: {e}')
+            print(f'Error writing to {save_path}: {e}')
 
     # the idea of this being a separate function is to run through
     # all the filters, save them, and open the findings without pause
