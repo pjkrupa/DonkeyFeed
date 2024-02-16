@@ -7,6 +7,10 @@ from rss_roster import Roster
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
 from config import Configs
+
+current_directory = os.path.dirname(os.path.realpath(__file__))
+os.chdir(current_directory)
+
 configurations = Configs('config.ini')
 
 class Session:

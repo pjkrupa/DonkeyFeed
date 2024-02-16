@@ -11,8 +11,7 @@ current_directory = os.path.dirname(os.path.realpath(__file__))
 os.chdir(current_directory)
 
 configurations = Configs('config.ini')
-# this line instantiates a class that includes the dataframe pull from the main CSV file
-# plus a number of methods for doing stuff with it.
+# this line instantiates a class that manages the roster pulled from the main .JSON file
 roster = Roster(configurations.rss_filters_path())
 
 printer.yellow('Hello! Welcome to DonkeyFeed, the worst RSS filter!')

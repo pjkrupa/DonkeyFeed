@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added the text for the 'help' screen">
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added a couple lines in donkeyfeed.py to set the current directory.">
+      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_16_0828.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_16_0833.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/command_prompt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/donkeyfeed.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/donkeyfeed.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/ui.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -214,7 +216,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708009229780</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="added a couple lines in donkeyfeed.py to set the current directory.">
+      <option name="closed" value="true" />
+      <created>1708068346446</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1708068346446</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -243,7 +253,8 @@
     <MESSAGE value="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho." />
     <MESSAGE value="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters" />
     <MESSAGE value="added the text for the 'help' screen" />
-    <option name="LAST_COMMIT_MESSAGE" value="added the text for the 'help' screen" />
+    <MESSAGE value="added a couple lines in donkeyfeed.py to set the current directory." />
+    <option name="LAST_COMMIT_MESSAGE" value="added a couple lines in donkeyfeed.py to set the current directory." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
