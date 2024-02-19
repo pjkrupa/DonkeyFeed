@@ -19,6 +19,9 @@ class Printer:
         self.color = Color()
         self.style = Style()
 
+    def default(self, text):
+        print(text)
+
     def red(self, text):
         print(self.color.RED + text + self.color.RESET)
 
@@ -52,6 +55,9 @@ class Printer:
 class Prompter:
     def __init__(self):
         self.color = Color()
+
+    def default(self, text):
+        return input(text)
 
     def green(self, text):
         return input(self.color.GREEN + text + self.color.RESET)

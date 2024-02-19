@@ -20,7 +20,7 @@ class Session:
     def yesno(self, question):
         while True:
             ans_list = ['y', 'n']
-            ans = self.prompter.green(question + ' >> ').lower()
+            ans = self.prompter.default(question + ' >> ').lower()
             if ans not in ans_list:
                 self.printer.red('Try again.')
             elif ans == 'n':
@@ -30,20 +30,20 @@ class Session:
 
     # a method for printing out the roster
     def list_rss_feeds(self):
-        print("Here are the saved RSS feeds you are filtering:")
+        print("Here are your saved RSS feed filters:")
         dashes = '-' * 120
-        self.printer.blue(dashes)
-        self.printer.magenta('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
-        self.printer.blue(dashes)
+        self.printer.default(dashes)
+        self.printer.default('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
+        self.printer.default(dashes)
         # self.roster.roster_loaded is the loaded JSON file
         for i in range(len(self.roster.roster_loaded)):
-            self.printer.yellow('{0:<10}{1:40}{2:40}{3}'.format(
+            self.printer.default('{0:<10}{1:40}{2:40}{3}'.format(
                 i,
                 self.roster.roster_loaded[i]['RSS feed name'][:30],
                 self.roster.roster_loaded[i]['URL'][:30],
                 self.roster.roster_loaded[i]['keywords'][:30])
             )
-        self.printer.blue(dashes)
+        self.printer.default(dashes)
 
     def run_filter(self, index_num, keywords=None):
         if keywords is None:
@@ -76,8 +76,9 @@ class Session:
                         self.roster.add_rss_feed(title, url, row)
         except FileNotFoundError:
             self.printer.red('File not found.')
+            return
         self.roster.save()
-        self.prompter.green('All done. Press <return> to continue.')
+        self.prompter.default('All done. Press <return> to continue.')
 
     def save_to_html(self, findings, keywords_found):
         keywords_found = list(set(keywords_found))
@@ -132,9 +133,9 @@ class Session:
             print("Results were found for the following search terms:\n")
             print(keywords)
         for item in findings:  # loops through the list of dicts and prints the values
-            self.printer.magenta(item['title'])
+            self.printer.default(item['title'])
             print(item['link'])
-            self.printer.yellow(item['summary'])
+            self.printer.default(item['summary'])
             print('--------------------------')
 
     def open_findings(self, html_path):
@@ -146,8 +147,7 @@ class Session:
     def add_rss_feed(self, new_title, new_url, keyword_list):
         self.roster.add_rss_feed(new_title, new_url, keyword_list)
         self.roster.save()
-        self.prompter.green("All done. Press return to continue.")
-        self.spacer()
+        self.printer.default("All done.")
 
     def remove_rss_feed(self, index_list):
         if self.yesno('Are you sure you want to delete? y/n'):
@@ -155,17 +155,20 @@ class Session:
             for index in index_list:
                 self.roster.remove_rss_feed(index)
             self.roster.save()
+            self.printer.default("All done.")
 
     def add_keywords(self, index, keyword_list):
         self.roster.add_keywords(index, keyword_list)
         self.roster.save()
+        self.printer.default("All done. Keywords added.")
 
     def remove_keywords(self, index, keyword_list):
         self.roster.remove_keywords(index, keyword_list)
         self.roster.save()
+        self.printer.default("All done.")
 
     def help(self):
-        self.printer.yellow("""
+        self.printer.default("""
 Here's a rundown of DonkeyFeed commands and how to use them:
 
 list                                Lists saved RSS filters, with the index numbers that are used to run them. 
@@ -214,18 +217,21 @@ exit                                Pretty self-explanatory IMO.
         """)
 
     def spacer(self):
-        self.printer.blue('\n----------------------------')
+        self.printer.default('\n----------------------------')
 
     def main_loop(self):
         while True:
             prompt = Command(self.roster)
-
             if prompt.command == 'run':
                 for index in prompt.index_list:
                     results = self.run_filter(index)
                     if results is not None:
                         findings, keywords_found = results
-                        self.report_findings(findings, keywords_found, self.roster.roster_loaded[index]['RSS feed name'])
+                        self.report_findings(
+                            findings,
+                            keywords_found,
+                            self.roster.roster_loaded[index]['RSS feed name']
+                        )
                         if self.yesno('Do you want to save these results?'):
                             path = self.save_to_html(findings, keywords_found)
                             if self.yesno('Do you want to view the results in a browser?'):
@@ -241,7 +247,7 @@ exit                                Pretty self-explanatory IMO.
                             self.open_findings(path)
                         if self.yesno('Do you want to save these keywords to your filter? >> '):
                             self.roster.add_keywords(prompt.index, prompt.keyword_list)
-                            self.printer.green('All set!\n')
+                            self.printer.default('All set!\n')
 
             elif prompt.command == 'run all':
                 self.run_all_filters()
