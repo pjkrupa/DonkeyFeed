@@ -155,16 +155,16 @@ class Session:
         self.printer.default("All done.")
 
     def delete_all(self):
-        if self.yesno(f'Are you sure you want to delete the entire {self.roster_name} roster?'):
+        if self.yesno(f'Are you sure you want to delete the entire {self.roster_name} roster? y/n'):
             self.rosters.delete_roster(self.roster_name)
             self.rosters.save()
             self.roster_list = self.get_roster_list()
             print("All done! Roster deleted.")
 
     def remove_rss_feed(self, index_list):
+        print(index_list)
         if self.yesno('Are you sure you want to delete? y/n'):
             index_list.sort(reverse=True)
-            print(index_list)
             for index in index_list:
                 self.rosters.remove_rss_feed(index, self.roster_name)
             self.rosters.save()
@@ -256,6 +256,7 @@ exit                                Pretty self-explanatory IMO.
                 results = self.run_filter(prompt.index, prompt.keyword_list)
                 if results is not None:
                     findings, keywords_found = results
+                    self.report_findings(findings, keywords_found, prompt.roster_name)
                     if self.yesno('Do you want to save these results? >> '):
                         path = self.save_to_html(findings, keywords_found)
                         if self.yesno('Do you want to view the results in a browser? >> '):

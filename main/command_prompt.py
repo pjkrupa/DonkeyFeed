@@ -111,6 +111,7 @@ class Command:
 # a match. if so, sets it as self.roster_name. if not, returns False
     def set_roster(self, string):
         string = string.strip('--')
+        self.roster_list.sort(key=len, reverse=True)
         for name in self.roster_list:
             if string.startswith(name):
                 self.roster_name = name
@@ -139,14 +140,14 @@ class Command:
             else:
                 index = int(index)
                 range_list.append(index)
+        if len(range_list) != 2:
+            return False
         if range_list[0] >= range_list[1]:
             return False
         index_list = []
         for i in range(range_list[0], range_list[1]+1):
             index_list.append(i)
-        print(index_list)
         self.index_list = index_list
-        print(self.index_list)
 
     def run(self, args):
         if self.make_list_ints(args) == False:
@@ -155,7 +156,7 @@ class Command:
         self.command = 'run'
 
     def run_special(self, args):
-        if self.check_index(args):
+        if self.check_index(args) == False:
             print('Invalid index number.')
             return
         self.command = 'run special'
@@ -172,10 +173,12 @@ class Command:
         self.command = 'remove keywords'
 
     def delete(self, args):
-        if not args:
+        print(args)
+        if args is None:
             self.command = 'delete'
         elif args.strip() == '*':
             self.command = 'delete all'
+            return
         elif self.make_list_ints(args) == False:
             print('Invalid index number.')
             return
@@ -198,7 +201,7 @@ class Command:
                 break
         self.roster_pick('Pick a roster (or type "cancel") >> ')
         keyword_string = self.prompter.default('Keywords, separated by commas >> ')
-        self.keyword_list = self.make_list_strs(keyword_string)
+        self.make_list_strs(keyword_string)
         self.command = 'new'
 
     def add_keywords(self, args):
@@ -214,7 +217,10 @@ class Command:
         self.command = 'add keywords'
 
     def upload(self):
-        path = self.prompter.default('File path >> ').lower().strip()
+        path = self.prompter.default('File path >> ').strip()
+        print(path)
+        result = os.path.exists(path)
+        print(result)
         if not os.path.exists(path):
             self.printer.default('File not found.')
             return
@@ -226,7 +232,7 @@ class Command:
             self.opml_path = path
         else:
             self.printer.default('Invalid file type, must be a CSV or OPML (XML).')
-        self.roster_pick('Pick the roster where you want to save your RSS feeds. >> ')
+        self.roster_pick('Select the roster where you want to save your RSS feeds. >> ')
 
     def list(self, args):
         print(args)
@@ -257,6 +263,7 @@ class Command:
             args = args.strip('--')
             if self.set_range(args) == False:
                 print('Invalid index or range.')
+                return
             args = None
 
         if command == 'run':
