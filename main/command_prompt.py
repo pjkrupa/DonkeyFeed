@@ -259,8 +259,8 @@ class Command:
                 args = self.strip_chars(args, self.roster_name).lower()
 
         # check if index argument is a range:
-        if args and args[0:2] == '--':
-            args = args.strip('--')
+        if args and args[0:2] == '**':
+            args = args.strip('**')
             if self.set_range(args) == False:
                 print('Invalid index or range.')
                 return
