@@ -4,16 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="changed all the path management to make it relative, cleaned up some test files.">
-      <change afterPath="$PROJECT_DIR$/main/user/search_results/2024_02_19_0806.html" afterDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="changed the Command class's prompt() method to check for valid arguments BEFORE registering the command.">
+      <change afterPath="$PROJECT_DIR$/main/cleanup.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/subscriptions.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main/user/search_results/2024_02_23_1029.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/RSS_parse.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/RSS_parse.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/command_prompt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/donkeyfeed.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/donkeyfeed.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/styles.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/styles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/rss_roster.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/rss_roster.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/main/ui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/RSS feed filters.json" beforeDir="false" afterPath="$PROJECT_DIR$/main/user/RSS feed filters.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/user/rss_manager.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/user/saved_feed_filters.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/search_results/Google News Technology2024_02_13_1137.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/search_results/Peter Krupa dot lol2024_02_15_0912.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1217.html" beforeDir="false" />
@@ -25,15 +26,9 @@
       <change beforePath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_15_1820.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_16_0828.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main/user/search_results/everything_2024_02_16_0833.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/user/test RSS.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/config.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/play.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_RSS_parse.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_files/20240127_140234.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_files/20240127_140653.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_files/20240127_140952.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_files/test.txt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -64,31 +59,33 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "Python.RSS_parse.executor": "Run",
-    "Python.command_prompt.executor": "Run",
-    "Python.config.executor": "Run",
-    "Python.donkeyfeed.executor": "Run",
-    "Python.gui.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.play.executor": "Run",
-    "Python.test_RSS_parse.executor": "Run",
-    "Python.test_database.executor": "Run",
-    "Python.ui.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "/home/peter/PycharmProjects/DonkeyFeed/tests",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.RSS_parse.executor&quot;: &quot;Run&quot;,
+    &quot;Python.cleanup.executor&quot;: &quot;Run&quot;,
+    &quot;Python.command_prompt.executor&quot;: &quot;Run&quot;,
+    &quot;Python.config.executor&quot;: &quot;Run&quot;,
+    &quot;Python.donkeyfeed.executor&quot;: &quot;Run&quot;,
+    &quot;Python.gui.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.play.executor&quot;: &quot;Run&quot;,
+    &quot;Python.rss_roster.executor&quot;: &quot;Debug&quot;,
+    &quot;Python.test_RSS_parse.executor&quot;: &quot;Run&quot;,
+    &quot;Python.test_database.executor&quot;: &quot;Run&quot;,
+    &quot;Python.ui.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/peter/PycharmProjects/DonkeyFeed&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "PLAIN_TEXT"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;PLAIN_TEXT&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings>
@@ -281,7 +278,15 @@
       <option name="project" value="LOCAL" />
       <updated>1708095190619</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="changed the Command class's prompt() method to check for valid arguments BEFORE registering the command.">
+      <option name="closed" value="true" />
+      <created>1708329597039</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1708329597040</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -313,19 +318,20 @@
     <MESSAGE value="added a couple lines in donkeyfeed.py to set the current directory." />
     <MESSAGE value="changed some comments" />
     <MESSAGE value="changed all the path management to make it relative, cleaned up some test files." />
-    <option name="LAST_COMMIT_MESSAGE" value="changed all the path management to make it relative, cleaned up some test files." />
+    <MESSAGE value="changed the Command class's prompt() method to check for valid arguments BEFORE registering the command." />
+    <option name="LAST_COMMIT_MESSAGE" value="changed the Command class's prompt() method to check for valid arguments BEFORE registering the command." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main/command_prompt.py</url>
-          <line>25</line>
+          <line>26</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/main/command_prompt.py</url>
-          <line>26</line>
+          <line>27</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>

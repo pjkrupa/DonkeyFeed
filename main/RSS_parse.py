@@ -26,8 +26,9 @@ class RSSfilter:
 
     def run_filter(self):
         for keyword in self.search_terms:
+            keyword_lower = keyword.lower()
             for item in self.rss_feed_items:
-                if keyword in item['title'] or keyword in item['summary']:
+                if keyword_lower in item['title'].lower() or keyword_lower in item['summary'].lower():
                     self.findings.append(item)
                     self.keywords_found.append(keyword)
         return self.findings

@@ -1,22 +1,25 @@
 import json
 from pathlib import Path
 from styles import Printer
+import csv
+import xml.etree.ElementTree as ET
 
-# the roster is the JSON file where all the RSS feeds and their keywords are saved.
-# this class loads and manages the roster.
+# rosters is the JSON file containing the rosters RSS feeds and their keywords.
+# this class loads and manages the rosters.
 
-class Roster:
+
+class Rosters:
 
     def __init__(self):
         # defines the path where the RSS roster is located
-        self.roster_path = Path(__file__).parent / 'user' / 'RSS feed filters.json'
-        self.roster_loaded = self.load()
+        self.rosters_path = Path(__file__).parent / 'user' / 'RSS feed filters.json'
+        self.rosters_loaded = self.load()
         self.printer = Printer()
 
     # loads the roster
     def load(self):
         try:
-            with open(self.roster_path, 'r') as f:
+            with open(self.rosters_path, 'r') as f:
                 json_data = json.load(f)
         except FileNotFoundError as e:
             print("Error when loading the file: ", str(e))
@@ -24,37 +27,63 @@ class Roster:
 
     def save(self):
         try:
-            with open(self.roster_path, 'w') as f:
-                json.dump(self.roster_loaded, f)
+            with open(self.rosters_path, 'w') as f:
+                json.dump(self.rosters_loaded, f)
         except FileNotFoundError as e:
             print("Error when saving the file: ", str(e))
 
     # the ui.py "add rss" method does this
-    def add_rss_feed(self, rss_name, rss_url, rss_keyword_list):
+    def add_rss_feed(self, rss_name, rss_url, rss_keyword_list, roster_name):
         new_entry = {
             "RSS feed name": rss_name,
             "URL": rss_url,
             "keywords": rss_keyword_list
         }
-        self.roster_loaded.append(new_entry)
+        if roster_name not in self.rosters_loaded:
+            self.rosters_loaded[roster_name] = [new_entry]
+        else:
+            self.rosters_loaded[roster_name].append(new_entry)
 
-    # to call this method, you need the index number of the RSS feed and a list of keywords to add as arguments
-    def add_keywords(self, index_num, new_keywords):
-        for string in new_keywords:
-            self.roster_loaded[index_num]['keywords'].append(string)
+    # to call this method, you need the name of the roster, the index number of the RSS feed,
+    # and a list of keywords to add as arguments
+    def add_keywords(self, index_num, new_keywords, roster_name):
+        print(new_keywords)
+        for keyword in new_keywords:
+            self.rosters_loaded[roster_name][index_num]['keywords'].append(keyword)
 
     # to call this method, you need the index number of the RSS feed and a list of keywords as arguments
-    def remove_keywords(self, index_num, nix_keywords):
-        print(self.roster_loaded[index_num]['keywords'])
-        new_list = [item for item in self.roster_loaded[index_num]['keywords'] if item not in nix_keywords]
-        print(new_list)
-        self.roster_loaded[index_num]['keywords'] = new_list
+    def remove_keywords(self, index_num, nix_keywords, roster_name):
+        new_list = [item for item in self.rosters_loaded[roster_name][index_num]['keywords'] if item not in nix_keywords]
+        self.rosters_loaded[roster_name][index_num]['keywords'] = new_list
 
     # to call this method, you need the index number of the RSS feed.
-    def remove_rss_feed(self, index_num):
-        self.roster_loaded.pop(index_num)
+    def remove_rss_feed(self, index_num, roster_name):
+        self.rosters_loaded[roster_name].pop(index_num)
 
+    def delete_roster(self, roster_name):
+        del self.rosters_loaded[roster_name]
 
+    def upload_csv(self, path, roster_name):
+        if roster_name not in self.rosters_loaded:
+            self.rosters_loaded[roster_name] = []
+        with open(path) as csvfile:
+            csvreader = csv.reader(csvfile)
+            for row in csvreader:
+                row = [item.strip() for item in row]
+                if len(row) >= 2:
+                    title = row[0]
+                    url = row[1]
+                    del row[0:2]
+                    self.add_rss_feed(title, url, row, roster_name)
 
-
-
+    def upload_opml(self, path, roster_name):
+        if roster_name not in self.rosters_loaded:
+            self.rosters_loaded[roster_name] = []
+        with open(path, 'r') as file:
+            tree = ET.parse(file)
+            root = tree.getroot()
+            for outline in root.findall('.//outline'):
+                if 'xmlUrl' in outline.attrib and 'title' in outline.attrib:
+                    title = outline.attrib['title'].strip()
+                    url = outline.attrib['xmlUrl'].strip()
+                    self.add_rss_feed(title, url, [], roster_name)

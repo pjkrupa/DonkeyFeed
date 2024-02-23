@@ -1,10 +1,10 @@
-from rss_roster import Roster
+from rss_roster import Rosters
 from ui import Session
 from styles import Printer
 printer = Printer()
 
 # this line instantiates a class that manages the roster pulled from the main .JSON file
-roster = Roster()
+roster = Rosters()
 
 printer.default('Hello! Welcome to DonkeyFeed, the worst RSS filter!')
 printer.default("""

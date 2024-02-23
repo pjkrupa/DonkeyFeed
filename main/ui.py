@@ -4,18 +4,24 @@ from pathlib import Path
 import datetime
 from command_prompt import Command
 import csv
-from rss_roster import Roster
+from rss_roster import Rosters
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
 
 class Session:
 
     # grabs the roster
-    def __init__(self, roster):
-        self.roster = roster
+    def __init__(self, rosters):
+        self.rosters = rosters
+        self.roster_name = 'general'
+        self.roster_list = self.get_roster_list()
         self.printer = Printer()
         self.prompter = Prompter()
         self.root = Path(__file__).parent
+
+    def get_roster_list(self):
+        list = [key for key in self.rosters.rosters_loaded]
+        return list
 
     def yesno(self, question):
         while True:
@@ -30,27 +36,31 @@ class Session:
 
     # a method for printing out the roster
     def list_rss_feeds(self):
-        print("Here are your saved RSS feed filters:")
+        print("Here are the saved RSS feed filters for the roster: ", self.roster_name)
         dashes = '-' * 120
         self.printer.default(dashes)
         self.printer.default('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
         self.printer.default(dashes)
-        # self.roster.roster_loaded is the loaded JSON file
-        for i in range(len(self.roster.roster_loaded)):
+        # self.rosters.rosters_loaded is the loaded JSON file
+        for i in range(len(self.rosters.rosters_loaded[self.roster_name])):
             self.printer.default('{0:<10}{1:40}{2:40}{3}'.format(
                 i,
-                self.roster.roster_loaded[i]['RSS feed name'][:30],
-                self.roster.roster_loaded[i]['URL'][:30],
-                self.roster.roster_loaded[i]['keywords'][:30])
+                self.rosters.rosters_loaded[self.roster_name][i]['RSS feed name'][:30],
+                self.rosters.rosters_loaded[self.roster_name][i]['URL'][:30],
+                self.rosters.rosters_loaded[self.roster_name][i]['keywords'][:30])
             )
         self.printer.default(dashes)
+        self.printer.default('\n')
+        self.printer.default('Your available rosters are: ')
+        self.printer.default(self.roster_list)
+        self.printer.default('To view a different roster, enter: list -<roster name>')
 
     def run_filter(self, index_num, keywords=None):
         if keywords is None:
-            keywords = self.roster.roster_loaded[index_num]['keywords']
+            keywords = self.rosters.rosters_loaded[self.roster_name][index_num]['keywords']
         rss_parsed = RSSfilter(
-            self.roster.roster_loaded[index_num]['RSS feed name'],
-            self.roster.roster_loaded[index_num]['URL'],
+            self.rosters.rosters_loaded[self.roster_name][index_num]['RSS feed name'],
+            self.rosters.rosters_loaded[self.roster_name][index_num]['URL'],
             keywords
         )
         rss_parsed.process()
@@ -58,26 +68,21 @@ class Session:
         if len(rss_parsed.findings) == 0:
             print(
                 "Nothing found for these keywords in ",
-                self.roster.roster_loaded[index_num]['RSS feed name']
+                self.rosters.rosters_loaded[self.roster_name][index_num]['RSS feed name']
             )
         else:
             return rss_parsed.findings, rss_parsed.keywords_found
 
-    def upload(self, path):
-        try:
-            with open(path) as csvfile:
-                csvreader = csv.reader(csvfile)
-                for row in csvreader:
-                    row = [item.strip() for item in row]
-                    if len(row) >= 2:
-                        title = row[0]
-                        url = row[1]
-                        del row[0:2]
-                        self.roster.add_rss_feed(title, url, row)
-        except FileNotFoundError:
-            self.printer.red('File not found.')
-            return
-        self.roster.save()
+    def upload_csv(self, path, roster_name):
+        self.rosters.upload_csv(path, roster_name)
+        self.rosters.save()
+        self.roster_list = self.get_roster_list()
+        self.prompter.default('All done. Press <return> to continue.')
+
+    def upload_opml(self, path, roster_name):
+        self.rosters.upload_opml(path, roster_name)
+        self.rosters.save()
+        self.roster_list = self.get_roster_list()
         self.prompter.default('All done. Press <return> to continue.')
 
     def save_to_html(self, findings, keywords_found):
@@ -116,7 +121,7 @@ class Session:
     def run_all_filters(self):
         full_results = []
         all_keywords_found = []
-        for i in range(len(self.roster.roster_loaded)):
+        for i in range(len(self.rosters.rosters_loaded[self.roster_name])):
             results = self.run_filter(i)
             if results is not None:
                 findings, keywords_found = results
@@ -145,26 +150,34 @@ class Session:
         webbrowser.open('file://' + fullpath)
 
     def add_rss_feed(self, new_title, new_url, keyword_list):
-        self.roster.add_rss_feed(new_title, new_url, keyword_list)
-        self.roster.save()
+        self.rosters.add_rss_feed(new_title, new_url, keyword_list, self.roster_name)
+        self.rosters.save()
         self.printer.default("All done.")
+
+    def delete_all(self):
+        if self.yesno(f'Are you sure you want to delete the entire {self.roster_name} roster?'):
+            self.rosters.delete_roster(self.roster_name)
+            self.rosters.save()
+            self.roster_list = self.get_roster_list()
+            print("All done! Roster deleted.")
 
     def remove_rss_feed(self, index_list):
         if self.yesno('Are you sure you want to delete? y/n'):
             index_list.sort(reverse=True)
+            print(index_list)
             for index in index_list:
-                self.roster.remove_rss_feed(index)
-            self.roster.save()
+                self.rosters.remove_rss_feed(index, self.roster_name)
+            self.rosters.save()
             self.printer.default("All done.")
 
     def add_keywords(self, index, keyword_list):
-        self.roster.add_keywords(index, keyword_list)
-        self.roster.save()
+        self.rosters.add_keywords(index, keyword_list, self.roster_name)
+        self.rosters.save()
         self.printer.default("All done. Keywords added.")
 
     def remove_keywords(self, index, keyword_list):
-        self.roster.remove_keywords(index, keyword_list)
-        self.roster.save()
+        self.rosters.remove_keywords(index, keyword_list, self.roster_name)
+        self.rosters.save()
         self.printer.default("All done.")
 
     def help(self):
@@ -201,7 +214,7 @@ add keywords <index number>         Adds one or more keywords to a saved feed fi
 
 remove keywords <index number>      Same as 'add keywords,' but for removing keywords from a saved feed filter. 
                                 
-upload <path>                       This is for uploading a .CSV file containing your RSS feeds for filtering, where <path>
+upload <path>                       This is selffor uploading a .CSV file containing your RSS feeds for filtering, where <path>
                                     is the path on your hard drive of the .CSV file. The file should have the following format:
                                     -------------------------------------------------------------------------------------------
                                     Column1             Column2         Column3         Column4         ColumnN+1     
@@ -221,7 +234,9 @@ exit                                Pretty self-explanatory IMO.
 
     def main_loop(self):
         while True:
-            prompt = Command(self.roster)
+            prompt = Command(self.rosters)
+            self.roster_name = prompt.roster_name
+            
             if prompt.command == 'run':
                 for index in prompt.index_list:
                     results = self.run_filter(index)
@@ -230,7 +245,7 @@ exit                                Pretty self-explanatory IMO.
                         self.report_findings(
                             findings,
                             keywords_found,
-                            self.roster.roster_loaded[index]['RSS feed name']
+                            self.rosters.rosters_loaded[self.roster_name][index]['RSS feed name']
                         )
                         if self.yesno('Do you want to save these results?'):
                             path = self.save_to_html(findings, keywords_found)
@@ -246,7 +261,7 @@ exit                                Pretty self-explanatory IMO.
                         if self.yesno('Do you want to view the results in a browser? >> '):
                             self.open_findings(path)
                         if self.yesno('Do you want to save these keywords to your filter? >> '):
-                            self.roster.add_keywords(prompt.index, prompt.keyword_list)
+                            self.rosters.add_keywords(prompt.index, prompt.keyword_list)
                             self.printer.default('All set!\n')
 
             elif prompt.command == 'run all':
@@ -264,11 +279,17 @@ exit                                Pretty self-explanatory IMO.
             elif prompt.command == 'remove keywords':
                 self.remove_keywords(prompt.index, prompt.keyword_list)
 
+            elif prompt.command == 'delete all':
+                self.delete_all()
+
             elif prompt.command == 'list':
                 self.list_rss_feeds()
 
-            elif prompt.command == 'upload':
-                self.upload(prompt.csv_path)
+            elif prompt.command == 'upload csv':
+                self.upload_csv(prompt.csv_path, self.roster_name)
+
+            elif prompt.command == 'upload opml':
+                self.upload_opml(prompt.opml_path, self.roster_name)
 
             elif prompt.command == 'exit':
                 break
