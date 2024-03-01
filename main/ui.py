@@ -63,6 +63,8 @@ class Session:
             self.rosters.rosters_loaded[self.roster_name][index_num]['URL'],
             keywords
         )
+        if rss_parsed.rss_dict is None:
+            return
         rss_parsed.process()
         rss_parsed.run_filter()
         if len(rss_parsed.findings) == 0:

@@ -1,4 +1,5 @@
-from styles import Prompter, Printer
+import pytest
+from main.styles import Prompter, Printer
 import os
 import validators
 
@@ -27,12 +28,12 @@ import validators
 class Command:
     def __init__(self, rosters_class):
         self.arg_commands = [
-            'run special', 'run', 'delete',
+            'run special', 'run all', 'run', 'delete',
             'add keywords', 'remove keywords', 'list',
             'upload csv', 'upload opml'
         ]
         self.solo_commands = [
-            'run all', 'help', 'exit', 'upload', 'new'
+            'help', 'exit', 'upload', 'new'
         ]
         self.index_list = []
         self.keyword_list = []
@@ -150,15 +151,16 @@ class Command:
         self.index_list = index_list
 
     def run(self, args):
-        if self.make_list_ints(args) == False:
+        if args and self.make_list_ints(args) is False:
             print('Invalid index.')
-            return
-        self.command = 'run'
-
+            return False
+        else:
+            self.command = 'run'
+        
     def run_special(self, args):
-        if self.check_index(args) == False:
+        if self.check_index(args) is False:
             print('Invalid index number.')
-            return
+            return False
         self.command = 'run special'
         keyword_string = self.prompter.default('Keywords, separated by commas >> ')
         self.make_list_strs(keyword_string)
@@ -166,39 +168,39 @@ class Command:
     def remove_keywords(self, args):
         if self.check_index(args) == False:
             print('Invalid index number.')
-            return
+            return False
         keyword_string = self.prompter.default('Keywords to remove, separated by commas >> ')
         self.make_list_strs(keyword_string)
         self.keyword_list.sort(reverse=True)
         self.command = 'remove keywords'
 
     def delete(self, args):
-        print(args)
-        if args is None:
+        # args == None would mean that a range of indexes was chosen
+        if args == None:
             self.command = 'delete'
         elif args.strip() == '*':
             self.command = 'delete all'
             return
         elif self.make_list_ints(args) == False:
             print('Invalid index number.')
-            return
+            return False
         else:
             self.command = 'delete'
 
     def new(self):
+        name = self.prompter.default('RSS feed name (or type "cancel") >> ')
+        if name == 'cancel':
+            return
         while True:
-            name = self.prompter.default('RSS feed name (or type "cancel") >> ')
-            if name == 'cancel':
-                return
             url = self.prompter.default('RSS feed URL (or type "cancel") >> ')
             if url == 'cancel':
                 return
             elif not validators.url(url):
                 self.printer.default('This is not a valid URL. Try again.')
             else:
-                self.new_title = name
-                self.new_url = url
                 break
+        self.new_title = name
+        self.new_url = url
         self.roster_pick('Pick a roster (or type "cancel") >> ')
         keyword_string = self.prompter.default('Keywords, separated by commas >> ')
         self.make_list_strs(keyword_string)
@@ -245,15 +247,14 @@ class Command:
 
         if not self.check_command(response):
             print('Invalid command.')
-            return
+            return False
         else:
             command, args = self.check_command(response)
-
         # check for a roster argument:
         if args and args[0:2] == '--':
-            if self.set_roster(args) == False:
+            if self.set_roster(args) is False:
                 print('Invalid roster name.')
-                return
+                return False
             else:
                 args = args.strip('--')
                 args = self.strip_chars(args, self.roster_name).lower()
@@ -261,9 +262,10 @@ class Command:
         # check if index argument is a range:
         if args and args[0:2] == '**':
             args = args.strip('**')
-            if self.set_range(args) == False:
+            if self.set_range(args) is False:
                 print('Invalid index or range.')
-                return
+                return False
+            # setting args to None signals that a range was used for the indexes
             args = None
 
         if command == 'run':
@@ -273,7 +275,7 @@ class Command:
             self.run_special(args)
 
         elif command == 'run all':
-            self.command = command
+            self.command = 'run all'
 
         elif command == 'delete':
             self.delete(args)
