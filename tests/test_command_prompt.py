@@ -1,4 +1,6 @@
-from main.command_prompt import Command
+import builtins
+
+from src.command_prompt import Command
 from unittest.mock import patch, MagicMock
 import random
 import pytest
@@ -74,13 +76,13 @@ class MockRosters:
 
 @pytest.fixture
 def mock_prompt():
-    with patch('main.command_prompt.Command.prompt') as mock:
+    with patch('src.command_prompt.Command.prompt') as mock:
         yield mock
 
 @pytest.fixture
 def command_instance(mock_prompt):
     mock_rosters_instance = MockRosters()
-    return Command(mock_rosters_instance)
+    return Command(mock_rosters_instance, 'general')
 
 @pytest.fixture
 def commands_with_arguments(command_instance) -> List[str]:
@@ -98,9 +100,12 @@ def test_check_commands_with_args(command_instance, commands_with_arguments):
     for command in commands_with_arguments:
         test_command = command + ' arguments'
         assert command_instance.check_command(test_command) == (command, 'arguments')
+    for command in commands_with_arguments:
+        assert command_instance.check_command(command) == (command, '')
 
 def test_check_bad_command(command_instance):
     assert command_instance.check_command('blah blah blah') is False
+    assert command_instance.check_command('run') is False
 
 def test_strip_characters(command_instance):
     string = "strip this leave this."
@@ -253,13 +258,11 @@ def test_new_valid_input(command_instance, monkeypatch):
     with patch('builtins.input', side_effect=[
         'feed name',
         'https://www.example.com/',
-        'roster',
         'keyword, keyword, keyword'
     ]):
         command_instance.new()
         assert command_instance.new_title == 'feed name'
         assert command_instance.new_url == 'https://www.example.com/'
-        assert command_instance.roster_name == 'roster'
         assert command_instance.keyword_list == ['keyword', 'keyword', 'keyword']
         assert command_instance.command == 'new'
 
@@ -295,3 +298,73 @@ def test_new_url_cancel(command_instance, monkeypatch):
         assert command_instance.roster_name == 'general'
         assert command_instance.keyword_list == []
         assert command_instance.command == None
+
+def test_add_keywords_valid_input(command_instance, monkeypatch):
+    with patch('builtins.input', return_value='keyword, keyword, keyword'):
+        command_instance.add_keywords('0')
+        assert command_instance.keyword_list == ['keyword', 'keyword', 'keyword']
+
+def test_add_keywords_invalid_input(command_instance, monkeypatch):
+    with patch('builtins.input', return_value='keyword, keyword, keyword'):
+        assert (command_instance.add_keywords('rex') is False
+                and command_instance.keyword_list == [])
+
+@patch('os.path.exists', return_value=True)
+def test_upload_valid_input_opml(mock_exists, command_instance):
+    test_opml = ['test_file.xml', 'test_file.opml']
+    for value in test_opml:
+        with patch('builtins.input', return_value=value):
+            command_instance.upload()
+            assert command_instance.command == 'upload opml'
+            assert command_instance.opml_path == value
+
+@patch('os.path.exists', return_value=True)
+def test_upload_valid_input_csv(mock_exists, command_instance):
+    with patch('builtins.input', return_value='test_file.csv'):
+        command_instance.upload()
+        assert command_instance.command == 'upload csv'
+        assert command_instance.csv_path == 'test_file.csv'
+
+@patch('os.path.exists', return_value=True)
+def test_upload_invalid_input(mock_exists, command_instance):
+    with patch('builtins.input', return_value='test_file.txt'):
+        assert command_instance.upload() is False
+
+@patch('os.path.exists', return_value=False)
+def test_upload_bad_path(mock_exists, command_instance):
+    with patch('builtins.input', return_value='test_file.csv'):
+        assert command_instance.upload() is False
+
+def test_prompt_valid_command(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='run 0'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'run'
+
+    with patch('builtins.input', return_value='run --general 0'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'run'
+
+    with patch('builtins.input', return_value='run 0,1'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'run'
+
+    with patch('builtins.input', return_value='run **0,2'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'run'
+
+def test_prompt_invalid_command(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='runk 0'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) is False
+    with patch('builtins.input', return_value='run'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) is False
+
+
+def test_prompt_valid_command(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='list'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'list'

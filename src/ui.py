@@ -13,7 +13,7 @@ class Session:
     # grabs the roster
     def __init__(self, rosters):
         self.rosters = rosters
-        self.roster_name = 'general'
+        self.current_roster = 'general'
         self.roster_list = self.get_roster_list()
         self.printer = Printer()
         self.prompter = Prompter()
@@ -36,31 +36,32 @@ class Session:
 
     # a method for printing out the roster
     def list_rss_feeds(self):
-        print("Here are the saved RSS feed filters for the roster: ", self.roster_name)
+        print("Here are the saved RSS feed filters for the current roster: ", self.current_roster)
         dashes = '-' * 120
         self.printer.default(dashes)
         self.printer.default('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
         self.printer.default(dashes)
         # self.rosters.rosters_loaded is the loaded JSON file
-        for i in range(len(self.rosters.rosters_loaded[self.roster_name])):
+        for i in range(len(self.rosters.rosters_loaded[self.current_roster])):
             self.printer.default('{0:<10}{1:40}{2:40}{3}'.format(
                 i,
-                self.rosters.rosters_loaded[self.roster_name][i]['RSS feed name'][:30],
-                self.rosters.rosters_loaded[self.roster_name][i]['URL'][:30],
-                self.rosters.rosters_loaded[self.roster_name][i]['keywords'][:30])
+                self.rosters.rosters_loaded[self.current_roster][i]['RSS feed name'][:30],
+                self.rosters.rosters_loaded[self.current_roster][i]['URL'][:30],
+                self.rosters.rosters_loaded[self.current_roster][i]['keywords'][:30])
             )
         self.printer.default(dashes)
         self.printer.default('\n')
         self.printer.default('Your available rosters are: ')
-        self.printer.default(self.roster_list)
-        self.printer.default('To view a different roster, enter: list --<roster name>\n')
+        print_roster = '  |  '.join(self.roster_list)
+        self.printer.default(print_roster)
+        self.printer.default('To change roster, enter: roster <roster name>\n')
 
     def run_filter(self, index_num, keywords=None):
         if keywords is None:
-            keywords = self.rosters.rosters_loaded[self.roster_name][index_num]['keywords']
+            keywords = self.rosters.rosters_loaded[self.current_roster][index_num]['keywords']
         rss_parsed = RSSfilter(
-            self.rosters.rosters_loaded[self.roster_name][index_num]['RSS feed name'],
-            self.rosters.rosters_loaded[self.roster_name][index_num]['URL'],
+            self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name'],
+            self.rosters.rosters_loaded[self.current_roster][index_num]['URL'],
             keywords
         )
         if rss_parsed.rss_dict is None:
@@ -70,7 +71,7 @@ class Session:
         if len(rss_parsed.findings) == 0:
             print(
                 "Nothing found for these keywords in ",
-                self.rosters.rosters_loaded[self.roster_name][index_num]['RSS feed name']
+                self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name']
             )
         else:
             return rss_parsed.findings, rss_parsed.keywords_found
@@ -123,7 +124,7 @@ class Session:
     def run_all_filters(self):
         full_results = []
         all_keywords_found = []
-        for i in range(len(self.rosters.rosters_loaded[self.roster_name])):
+        for i in range(len(self.rosters.rosters_loaded[self.current_roster])):
             results = self.run_filter(i)
             if results is not None:
                 findings, keywords_found = results
@@ -152,15 +153,19 @@ class Session:
         webbrowser.open('file://' + fullpath)
 
     def add_rss_feed(self, new_title, new_url, keyword_list):
-        self.rosters.add_rss_feed(new_title, new_url, keyword_list, self.roster_name)
+        self.rosters.add_rss_feed(new_title, new_url, keyword_list, self.current_roster)
         self.rosters.save()
         self.printer.default("All done.")
 
     def delete_all(self):
-        if self.yesno(f'Are you sure you want to delete the entire {self.roster_name} roster? y/n'):
-            self.rosters.delete_roster(self.roster_name)
+        if self.current_roster == 'general':
+            print("You can't delete the 'general' roster.")
+            return False
+        if self.yesno(f'Are you sure you want to delete the entire {self.current_roster} roster? y/n'):
+            self.rosters.delete_roster(self.current_roster)
             self.rosters.save()
             self.roster_list = self.get_roster_list()
+            self.current_roster = 'general'
             print("All done! Roster deleted.")
 
     def remove_rss_feed(self, index_list):
@@ -168,26 +173,38 @@ class Session:
         if self.yesno('Are you sure you want to delete? y/n'):
             index_list.sort(reverse=True)
             for index in index_list:
-                self.rosters.remove_rss_feed(index, self.roster_name)
+                self.rosters.remove_rss_feed(index, self.current_roster)
             self.rosters.save()
             self.printer.default("All done.")
 
     def add_keywords(self, index, keyword_list):
-        self.rosters.add_keywords(index, keyword_list, self.roster_name)
+        self.rosters.add_keywords(index, keyword_list, self.current_roster)
         self.rosters.save()
         self.printer.default("All done. Keywords added.")
 
     def remove_keywords(self, index, keyword_list):
-        self.rosters.remove_keywords(index, keyword_list, self.roster_name)
+        self.rosters.remove_keywords(index, keyword_list, self.current_roster)
         self.rosters.save()
         self.printer.default("All done.")
+
+    def new_roster(self, roster_name):
+        dummy_title = 'peter krupa dot lol'
+        dummy_url = 'https://www.peterkrupa.lol/feed'
+        dummy_keywords = ['live', 'laugh', 'love']
+        self.rosters.add_rss_feed(
+            dummy_title,
+            dummy_url,
+            dummy_keywords,
+            roster_name
+        )
+        self.rosters.save()
+        self.roster_list = self.get_roster_list()
 
     def help(self):
         self.printer.default("""
 -----------------------------------------------------------------------------------------------------------------------
 DonkeyFeed saves your feed filters into rosters, and you can group feeds into different rosters if you want. By default, 
-all your feeds are saved to the 'general' roster and that's the one that runs automatically with all the commands, so 
-if you don't want to use multiple rosters, you can just ignore this.
+it saves all your feeds are saved to the 'general' roster. 
 
 If you do want to use different rosters, use the argument '--<roster name>' after a command.
 For example: 
@@ -257,8 +274,8 @@ exit                                Pretty self-explanatory IMO.
 
     def main_loop(self):
         while True:
-            prompt = Command(self.rosters)
-            self.roster_name = prompt.roster_name
+            prompt = Command(self.rosters, self.current_roster)
+            self.current_roster = prompt.roster_name
             
             if prompt.command == 'run':
                 for index in prompt.index_list:
@@ -268,7 +285,7 @@ exit                                Pretty self-explanatory IMO.
                         self.report_findings(
                             findings,
                             keywords_found,
-                            self.rosters.rosters_loaded[self.roster_name][index]['RSS feed name']
+                            self.rosters.rosters_loaded[self.current_roster][index]['RSS feed name']
                         )
                         if self.yesno('Do you want to save these results?'):
                             path = self.save_to_html(findings, keywords_found)
@@ -297,6 +314,9 @@ exit                                Pretty self-explanatory IMO.
             elif prompt.command == 'delete':
                 self.remove_rss_feed(prompt.index_list)
 
+            elif prompt.command == 'roster':
+                self.current_roster = prompt.roster_name
+
             elif prompt.command == 'add keywords':
                 self.add_keywords(prompt.index, prompt.keyword_list)
 
@@ -310,10 +330,13 @@ exit                                Pretty self-explanatory IMO.
                 self.list_rss_feeds()
 
             elif prompt.command == 'upload csv':
-                self.upload_csv(prompt.csv_path, self.roster_name)
+                self.upload_csv(prompt.csv_path, self.current_roster)
 
             elif prompt.command == 'upload opml':
-                self.upload_opml(prompt.opml_path, self.roster_name)
+                self.upload_opml(prompt.opml_path, self.current_roster)
+
+            elif prompt.command == 'new roster':
+                self.new_roster(prompt.new_roster_name)
 
             elif prompt.command == 'exit':
                 break

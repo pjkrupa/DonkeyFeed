@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "DonkeyFeed"
+version = "0.0.1"
+authors = [
+  { name="Peter Krupa", email="pjkrupa@proton.me" },
+]
+description = "A tool for filtering RSS feeds for keywords and displaying the findings."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+]
+
+[project.urls]
+Homepage = "https://github.com/pjkrupa/DonkeyFeed"
+Issues = "https://github.com/pypa/DonkeyFeed/issues"

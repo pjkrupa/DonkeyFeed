@@ -1,12 +1,12 @@
 import pytest
-from main.styles import Prompter, Printer
+from src.styles import Prompter, Printer
 import os
 import validators
 
 # the Command class does some basic collecting and parsing of user
 # input and then instantiates:
 # 1) the command; 2) a list of keywords; 3) a list of index numbers
-# as easily accessible via dot notation on the class object
+# and 4) the roster as easily accessible via dot notation on the class object
 
 # format for running commands is:
 
@@ -15,7 +15,9 @@ import validators
 #   prompt "keywords, separated by commas >> "
 # - run all
 # - delete <index numbers, separated by commas>
-# - new <feed name>
+# - roster <roster name>
+# - new
+#   prompt "Feed name >> "
 #   prompt "URL >> "
 #   prompt "keywords, separated by commas >> "
 # - add keywords <index number>
@@ -26,14 +28,14 @@ import validators
 # - help
 
 class Command:
-    def __init__(self, rosters_class):
+    def __init__(self, rosters_class, current_roster):
         self.arg_commands = [
-            'run special', 'run all', 'run', 'delete',
-            'add keywords', 'remove keywords', 'list',
+            'run special', 'run all', 'run', 'roster', 'delete',
+            'add keywords', 'remove keywords',
             'upload csv', 'upload opml'
         ]
         self.solo_commands = [
-            'help', 'exit', 'upload', 'new'
+            'help', 'exit', 'upload', 'new', 'new roster', 'list'
         ]
         self.index_list = []
         self.keyword_list = []
@@ -44,11 +46,12 @@ class Command:
         self.printer = Printer()
         self.new_title = None
         self.new_url = None
+        self.new_roster_name = None
         self.opml_path = None
         self.csv_path = None
-        self.roster_name = 'general'
+        self.roster_name = current_roster
         self.roster_list = [key for key in self.rosters.rosters_loaded]
-        self.prompt()
+        self.prompt(self.roster_name)
 
 # the following are a series of functions that can be called to process the user input
 
@@ -111,7 +114,6 @@ class Command:
 # strips the '-', and loops through the list of roster names to see if there's
 # a match. if so, sets it as self.roster_name. if not, returns False
     def set_roster(self, string):
-        string = string.strip('--')
         self.roster_list.sort(key=len, reverse=True)
         for name in self.roster_list:
             if string.startswith(name):
@@ -121,8 +123,8 @@ class Command:
 
     def roster_pick(self, message):
         self.printer.default(message)
-        for name in self.roster_list:
-            print(name + '  |  ')
+        roster_names = '  |  '.join(self.roster_list)
+        print(roster_names)
         roster = self.prompter.default(
             'The default roster is "general" if you simply hit <return>. You can also enter a new roster >> '
         )
@@ -151,11 +153,16 @@ class Command:
         self.index_list = index_list
 
     def run(self, args):
-        if args and self.make_list_ints(args) is False:
+        if args and args[0:2] == '--':
+            args = args.strip('--')
+            if self.set_range(args) is False:
+                print('Invalid index or range.')
+                return False
+            self.command = 'run'
+            return
+        elif self.make_list_ints(args) is False:
             print('Invalid index.')
             return False
-        else:
-            self.command = 'run'
         
     def run_special(self, args):
         if self.check_index(args) is False:
@@ -174,14 +181,24 @@ class Command:
         self.keyword_list.sort(reverse=True)
         self.command = 'remove keywords'
 
+    def roster(self, args):
+        if self.set_roster(args) == False:
+            print('Invalid roster.')
+            return False
+        else:
+            self.command = 'roster'
+
     def delete(self, args):
-        # args == None would mean that a range of indexes was chosen
-        if args == None:
+        if args and args[0:2] == '--':
+            args = args.strip('--')
+            if self.set_range(args) is False:
+                print('Invalid index or range.')
+                return False
             self.command = 'delete'
         elif args.strip() == '*':
             self.command = 'delete all'
             return
-        elif self.make_list_ints(args) == False:
+        elif self.make_list_ints(args) is False:
             print('Invalid index number.')
             return False
         else:
@@ -201,7 +218,6 @@ class Command:
                 break
         self.new_title = name
         self.new_url = url
-        self.roster_pick('Pick a roster (or type "cancel") >> ')
         keyword_string = self.prompter.default('Keywords, separated by commas >> ')
         self.make_list_strs(keyword_string)
         self.command = 'new'
@@ -212,7 +228,7 @@ class Command:
                 'You need to enter the index number of the RSS feed where you want to add the keywords.'
                 ' Type "list" to view the roster.'
             )
-            return
+            return False
         keyword_string = self.prompter.default('Keywords to add, separated by commas >> ')
         self.make_list_strs(keyword_string)
         print(self.keyword_list)
@@ -225,7 +241,7 @@ class Command:
         print(result)
         if not os.path.exists(path):
             self.printer.default('File not found.')
-            return
+            return False
         elif path.endswith('.csv'):
             self.command = 'upload csv'
             self.csv_path = path
@@ -234,72 +250,81 @@ class Command:
             self.opml_path = path
         else:
             self.printer.default('Invalid file type, must be a CSV or OPML (XML).')
+            return False
         self.roster_pick('Select the roster where you want to save your RSS feeds. >> ')
 
-    def list(self, args):
-        print(args)
-        self.command = 'list'
+    def new_roster(self):
+        roster_name = self.prompter.default('Roster name ')
+        self.new_roster_name = roster_name
+        self.command = 'new roster'
 
-    def prompt(self):
+    def prompt(self, current_roster):
         self.index_list.clear()
         self.keyword_list.clear()
-        response = self.prompter.default("DonkeyFeed >> ")
+        response = self.prompter.default(f"DonkeyFeed/{current_roster} >> ")
 
         if not self.check_command(response):
-            print('Invalid command.')
+            print('Invalid command or command format.')
             return False
         else:
             command, args = self.check_command(response)
-        # check for a roster argument:
-        if args and args[0:2] == '--':
-            if self.set_roster(args) is False:
-                print('Invalid roster name.')
-                return False
-            else:
-                args = args.strip('--')
-                args = self.strip_chars(args, self.roster_name).lower()
-
-        # check if index argument is a range:
-        if args and args[0:2] == '**':
-            args = args.strip('**')
-            if self.set_range(args) is False:
-                print('Invalid index or range.')
-                return False
-            # setting args to None signals that a range was used for the indexes
-            args = None
 
         if command == 'run':
-            self.run(args)
+            if args == '':
+                print('Needs an index number')
+                return False
+            else:
+                self.run(args)
+                return 'run'
 
         elif command == 'run special':
             self.run_special(args)
+            return 'run special'
 
         elif command == 'run all':
             self.command = 'run all'
+            return 'run all'
+
+        elif command == 'roster':
+            self.roster(args)
+            return 'roster'
 
         elif command == 'delete':
             self.delete(args)
+            return 'delete'
 
         elif command == 'new':
             self.new()
+            return 'new'
 
         elif command == 'add keywords':
             self.add_keywords(args)
+            return 'add keywords'
 
         elif command == 'remove keywords':
             self.remove_keywords(args)
+            return 'remove keywords'
 
         elif command == 'upload':
             self.upload()
+            return 'upload'
+
+        elif command == 'new roster':
+            self.new_roster()
+            return 'new roster'
 
         elif command == 'help':
             self.command = command
+            return 'help'
 
         elif command == 'list':
-            self.list(args)
+            self.command = 'list'
+            return 'list'
 
         elif command == 'readme':
             self.command = 'readme'
+            return 'readme'
 
         elif response.lower() == 'exit':
             self.command = 'exit'
+            return 'exit'
