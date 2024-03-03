@@ -204,22 +204,18 @@ class Session:
         self.printer.default("""
 -----------------------------------------------------------------------------------------------------------------------
 DonkeyFeed saves your feed filters into rosters, and you can group feeds into different rosters if you want. By default, 
-it saves all your feeds are saved to the 'general' roster. 
+ all your feeds are saved to the 'general' roster. 
 
-If you do want to use different rosters, use the argument '--<roster name>' after a command.
-For example: 
-    'run --technology 4, 5, 6' 
-...will run RSS filters 4, 5, and 6 from the 'technology' roster. 
-    'list --sports'
-... will show a list of the feeds from the 'sports' roster.
-
-You will have the option to start a new roster when you add a feed or upload a .CSV or .OPML of your feeds.
+The current roster is indicated in the DonkeyFeed command line (ie - 'DonkeyFeed/general >> ').
+If you do want to use different rosters, just type 'roster <roster name>' and the new current roster will be indicated
+in the command line (ie - 'DonkeyFeed/new roster >>').
 
 -----------------------------------------------------------------------------------------------------------------------
 
 Here's a rundown of DonkeyFeed commands and how to use them.
 
-list                                Lists saved RSS filters, with the index numbers that are used to run them. 
+list                                Lists saved RSS filters in the current roster, with the index numbers that are 
+                                    used to run them. 
 
 run <index numbers>                 Runs an RSS filter, using index numbers. You can run a single feed filter (eg: 'run 2') 
                                     or multiple feed filters at once (eg: 'run 1, 2, 7, 19'). Makes sure the index numbers
@@ -227,7 +223,7 @@ run <index numbers>                 Runs an RSS filter, using index numbers. You
                                     to save the results or view them in a browser. You can also run a range of 
                                     filters like so: 'run **2,7', which will run all filters from 2 to 7, inclusive.
                                     
-run all                             The nuclear option. This runs every filter in the roster, saves the
+run all                             The nuclear option. This runs every filter in the current roster, saves the
                                     results to an HTML file, and opens it in your default browser. A quick and easy way 
                                     to run all the saved feed filters on a roster at once.
                                     
@@ -240,16 +236,21 @@ run special <index number>          This is for running a saved RSS feed with ne
 new                                 Saves a new RSS feed filter to the roster. You will be prompted for the name and URL 
                                     address of the RSS feed, and the keywords for the filter, separated by commas.
                                     
+new roster                          Creates a new roster. You can then add to the roster using the 'new' command or the
+                                    'upload' command.
+                                    
 delete <index numbers>              Deletes one or more saved feed filters from the roster, with multiple index numbers
                                     being separated by commas. (eg: 'delete 5, 8, 12')
 
-delete --<roster name> *            This will delete a whole roster.
+delete *                            This will delete the current roster. You cannot delete the 'general' roster.
                                     
-add keywords <index number>         Adds one or more keywords to a saved feed filter. (eg: 'add keywords 8' where '8' is
-                                    the index number of the feed filter where you want to add the keywords.) You will
-                                    then be prompted to enter a list of new keywords, separated by commas.
+add keywords <index number>         Adds one or more keywords to a feed filter in the current roster. 
+                                    (eg: 'add keywords 8' where '8' is the index number of the feed filter where you 
+                                    want to add the keywords.) You will then be prompted to enter a list of new 
+                                    keywords, separated by commas.
 
-remove keywords <index number>      Same as 'add keywords,' but for removing keywords from a saved feed filter. 
+remove keywords <index number>      Same as 'add keywords,' but for removing keywords from a saved feed filter in the 
+                                    current roster. 
                                 
 upload                              This is self for uploading a .CSV or an .OPML file containing your RSS feeds for 
                                     filtering. For a .CSV file, the format should be as follows:

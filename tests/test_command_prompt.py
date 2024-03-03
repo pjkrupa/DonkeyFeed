@@ -100,8 +100,6 @@ def test_check_commands_with_args(command_instance, commands_with_arguments):
     for command in commands_with_arguments:
         test_command = command + ' arguments'
         assert command_instance.check_command(test_command) == (command, 'arguments')
-    for command in commands_with_arguments:
-        assert command_instance.check_command(command) == (command, '')
 
 def test_check_bad_command(command_instance):
     assert command_instance.check_command('blah blah blah') is False
@@ -145,8 +143,8 @@ def test_make_list_ints_with_invalid_indexes(command_instance):
         assert command_instance.make_list_ints(string) is False
 
 def test_set_roster_with_valid_roster_name(command_instance):
-    test_string1 = '--general'
-    test_string2 = '--general2'
+    test_string1 = 'general'
+    test_string2 = 'general2'
     command_instance.set_roster(test_string1)
     assert command_instance.roster_name == 'general'
     command_instance.set_roster(test_string2)
@@ -193,8 +191,7 @@ def test_run_invalid_indexes(command_instance):
     assert command_instance.run(str(len(command_instance.rosters.rosters_loaded[command_instance.roster_name]) + 1)) is False
 
 def test_run_valid_indexes(command_instance):
-    command_instance.set_range('0,2')
-    command_instance.run(None)
+    command_instance.run('--0,2')
     assert (command_instance.index_list == [0, 1, 2]
             and command_instance.command == 'run')
     command_instance.run('0,1,2')
@@ -235,8 +232,7 @@ def test_remove_keywords_invalid_index_number(command_instance, monkeypatch):
                 and command_instance.command is None)
 
 def test_delete_valid_args(command_instance):
-    command_instance.set_range('0,2')
-    command_instance.delete(None)
+    command_instance.delete('--0,2')
     assert (command_instance.command == 'delete'
             and command_instance.index_list == [0, 1, 2])
     command_instance.index_list = []
@@ -271,13 +267,11 @@ def test_new_invalid_url(command_instance, monkeypatch):
         'feed name',
         'fart. com',  # <-- testing this invalid URL
         'https://www.example.com/',
-        'roster',
         'keyword, keyword, keyword'
     ]):
         command_instance.new()
         assert command_instance.new_title == 'feed name'
         assert command_instance.new_url == 'https://www.example.com/'
-        assert command_instance.roster_name == 'roster'
         assert command_instance.keyword_list == ['keyword', 'keyword', 'keyword']
         assert command_instance.command == 'new'
 
@@ -349,7 +343,7 @@ def test_prompt_valid_command(monkeypatch):
         command_instance = Command(mock_rosters, 'general')
         assert command_instance.prompt(command_instance.roster_name) == 'run'
 
-    with patch('builtins.input', return_value='run **0,2'):
+    with patch('builtins.input', return_value='run --0,2'):
         command_instance = Command(mock_rosters, 'general')
         assert command_instance.prompt(command_instance.roster_name) == 'run'
 
@@ -362,9 +356,42 @@ def test_prompt_invalid_command(monkeypatch):
         command_instance = Command(mock_rosters, 'general')
         assert command_instance.prompt(command_instance.roster_name) is False
 
+@patch('src.command_prompt.Command.new')
+def test_prompt_response_new(mock_new, monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='new'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'new'
 
-def test_prompt_valid_command(monkeypatch):
+def test_prompt_response_list(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='list'):
         command_instance = Command(mock_rosters, 'general')
         assert command_instance.prompt(command_instance.roster_name) == 'list'
+    with patch('builtins.input', return_value='exit'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'exit'
+
+def test_prompt_response_exit(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='exit'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'exit'
+
+def test_prompt_response_help(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='help'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'help'
+
+def test_prompt_response_upload(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='upload'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'upload'
+
+def test_prompt_response_new_roster(monkeypatch):
+    mock_rosters = MockRosters()
+    with patch('builtins.input', return_value='new roster'):
+        command_instance = Command(mock_rosters, 'general')
+        assert command_instance.prompt(command_instance.roster_name) == 'new roster'

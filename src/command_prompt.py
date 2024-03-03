@@ -30,16 +30,16 @@ import validators
 class Command:
     def __init__(self, rosters_class, current_roster):
         self.arg_commands = [
-            'run special', 'run all', 'run', 'roster', 'delete',
-            'add keywords', 'remove keywords',
-            'upload csv', 'upload opml'
+            'run', 'roster', 'delete',
+            'add keywords', 'remove keywords'
         ]
         self.solo_commands = [
-            'help', 'exit', 'upload', 'new', 'new roster', 'list'
+            'help', 'exit', 'upload', 'new', 'list', 'upload'
         ]
         self.index_list = []
         self.keyword_list = []
         self.command = None
+        self.args = None
         self.index = None
         self.rosters = rosters_class
         self.prompter = Prompter()
@@ -58,11 +58,12 @@ class Command:
     def check_command(self, string):
         for command in self.solo_commands:
             if string.lower() == command:
-                return command.lower(), None
-        for command in self.arg_commands:
-            if string.lower().startswith(command):
+                return command, None
+        sorted_list = sorted(self.arg_commands, key=len, reverse=True)
+        for command in sorted_list:
+            if string.lower().startswith(command + ' '):
                 args = self.strip_chars(string, command).strip()
-                return command.lower(), args
+                return command, args
         return False
 
 # strips characters from the beginning of a string based on the length of chars
@@ -153,7 +154,7 @@ class Command:
         self.index_list = index_list
 
     def run(self, args):
-        if args and args[0:2] == '--':
+        if args[0:2] == '--':
             args = args.strip('--')
             if self.set_range(args) is False:
                 print('Invalid index or range.')
@@ -267,42 +268,45 @@ class Command:
             print('Invalid command or command format.')
             return False
         else:
-            command, args = self.check_command(response)
+            command, self.args = self.check_command(response)
 
         if command == 'run':
-            if args == '':
+            if self.args == '':
                 print('Needs an index number')
                 return False
+            elif self.args.startswith('special'):
+                self.args = self.args.strip('special')
+                self.run_special(self.args)
+                return 'run'
+            elif self.args == 'all':
+                self.command = 'run all'
             else:
-                self.run(args)
+                self.run(self.args)
                 return 'run'
 
-        elif command == 'run special':
-            self.run_special(args)
-            return 'run special'
-
-        elif command == 'run all':
-            self.command = 'run all'
-            return 'run all'
-
         elif command == 'roster':
-            self.roster(args)
+            self.roster(self.args)
             return 'roster'
 
         elif command == 'delete':
-            self.delete(args)
+            self.delete(self.args)
             return 'delete'
 
         elif command == 'new':
-            self.new()
-            return 'new'
+            if self.args == 'roster':
+                self.new_roster()
+                self.command = 'new roster'
+                return 'new roster'
+            else:
+                self.new()
+                return 'new'
 
         elif command == 'add keywords':
-            self.add_keywords(args)
+            self.add_keywords(self.args)
             return 'add keywords'
 
         elif command == 'remove keywords':
-            self.remove_keywords(args)
+            self.remove_keywords(self.args)
             return 'remove keywords'
 
         elif command == 'upload':
