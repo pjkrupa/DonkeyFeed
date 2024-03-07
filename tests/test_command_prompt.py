@@ -1,6 +1,10 @@
-import builtins
+import sys
+import os
+current_dir = os.path.dirname(os.path.realpath(__file__))
+src_dir = os.path.abspath(os.path.join(current_dir, '..', 'src'))
+sys.path.append(src_dir)
 
-from src.command_prompt import Command
+from command_prompt import Command
 from unittest.mock import patch, MagicMock
 import random
 import pytest
@@ -76,7 +80,7 @@ class MockRosters:
 
 @pytest.fixture
 def mock_prompt():
-    with patch('src.command_prompt.Command.prompt') as mock:
+    with patch('command_prompt.Command.prompt') as mock:
         yield mock
 
 @pytest.fixture
@@ -356,7 +360,7 @@ def test_prompt_invalid_command(monkeypatch):
         command_instance = Command(mock_rosters, 'general')
         assert command_instance.prompt(command_instance.roster_name) is False
 
-@patch('src.command_prompt.Command.new')
+@patch('command_prompt.Command.new')
 def test_prompt_response_new(mock_new, monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='new'):

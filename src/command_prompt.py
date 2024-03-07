@@ -1,5 +1,5 @@
 import pytest
-from src.styles import Prompter, Printer
+from styles import Prompter, Printer
 import os
 import validators
 
@@ -31,10 +31,10 @@ class Command:
     def __init__(self, rosters_class, current_roster):
         self.arg_commands = [
             'run', 'roster', 'delete',
-            'add keywords', 'remove keywords'
+            'add keywords', 'remove keywords', 'new'
         ]
         self.solo_commands = [
-            'help', 'exit', 'upload', 'new', 'list', 'upload'
+            'help', 'exit', 'upload', 'list', 'upload', 'new'
         ]
         self.index_list = []
         self.keyword_list = []
@@ -56,14 +56,16 @@ class Command:
 # the following are a series of functions that can be called to process the user input
 
     def check_command(self, string):
-        for command in self.solo_commands:
-            if string.lower() == command:
-                return command, None
         sorted_list = sorted(self.arg_commands, key=len, reverse=True)
         for command in sorted_list:
             if string.lower().startswith(command + ' '):
                 args = self.strip_chars(string, command).strip()
                 return command, args
+        for command in self.solo_commands:
+            if string.lower() == command:
+                return command, None
+
+
         return False
 
 # strips characters from the beginning of a string based on the length of chars
@@ -164,6 +166,8 @@ class Command:
         elif self.make_list_ints(args) is False:
             print('Invalid index.')
             return False
+        else:
+            self.command = 'run'
         
     def run_special(self, args):
         if self.check_index(args) is False:
@@ -202,6 +206,9 @@ class Command:
         elif self.make_list_ints(args) is False:
             print('Invalid index number.')
             return False
+        elif args.strip() == 'timestamps':
+            self.command = 'delete timestamps'
+            return
         else:
             self.command = 'delete'
 
@@ -297,9 +304,12 @@ class Command:
                 self.new_roster()
                 self.command = 'new roster'
                 return 'new roster'
-            else:
+            elif self.args is None:
                 self.new()
                 return 'new'
+            else:
+                print('Invalid argument')
+                return False
 
         elif command == 'add keywords':
             self.add_keywords(self.args)
@@ -312,10 +322,6 @@ class Command:
         elif command == 'upload':
             self.upload()
             return 'upload'
-
-        elif command == 'new roster':
-            self.new_roster()
-            return 'new roster'
 
         elif command == 'help':
             self.command = command

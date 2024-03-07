@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 from styles import Printer
 import csv
@@ -32,12 +33,17 @@ class Rosters:
         except FileNotFoundError as e:
             print("Error when saving the file: ", str(e))
 
+    def save_timestamp(self, roster_name, index_num, timestamp):
+        self.rosters_loaded[roster_name][index_num]['timestamp'] = timestamp.isoformat()
+
     # the ui.py "add rss" method does this
     def add_rss_feed(self, rss_name, rss_url, rss_keyword_list, roster_name):
+        zero_datetime = datetime.min.isoformat()
         new_entry = {
             "RSS feed name": rss_name,
             "URL": rss_url,
-            "keywords": rss_keyword_list
+            "keywords": rss_keyword_list,
+            "timestamp": zero_datetime
         }
         if roster_name not in self.rosters_loaded:
             self.rosters_loaded[roster_name] = [new_entry]
@@ -47,7 +53,7 @@ class Rosters:
     # to call this method, you need the name of the roster, the index number of the RSS feed,
     # and a list of keywords to add as arguments
     def add_keywords(self, index_num, new_keywords, roster_name):
-        print(new_keywords)
+        print(*new_keywords, sep=', ')
         for keyword in new_keywords:
             self.rosters_loaded[roster_name][index_num]['keywords'].append(keyword)
 

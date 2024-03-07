@@ -1,10 +1,9 @@
 import webbrowser
+import time
+from datetime import datetime as dt
 import os
 from pathlib import Path
-import datetime
 from command_prompt import Command
-import csv
-from rss_roster import Rosters
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
 
@@ -18,6 +17,7 @@ class Session:
         self.printer = Printer()
         self.prompter = Prompter()
         self.root = Path(__file__).parent
+        self.timestamp = dt.now()
 
     def get_roster_list(self):
         list = [key for key in self.rosters.rosters_loaded]
@@ -67,8 +67,9 @@ class Session:
         if rss_parsed.rss_dict is None:
             return
         rss_parsed.process()
-        rss_parsed.run_filter()
-        if len(rss_parsed.findings) == 0:
+        rss_parsed.run_filter(self.rosters.rosters_loaded[self.current_roster][index_num]['timestamp'])
+        self.rosters.save_timestamp(self.current_roster, index_num, self.timestamp)
+        if len(rss_parsed.findings['new stuff']) + len(rss_parsed.findings['old stuff']) == 0:
             print(
                 "Nothing found for these keywords in ",
                 self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name']
@@ -89,8 +90,11 @@ class Session:
         self.prompter.default('All done. Press <return> to continue.')
 
     def save_to_html(self, findings, keywords_found):
-        keywords_found = list(set(keywords_found))
-        date_and_time = datetime.datetime.now().strftime("%Y_%m_%d_%H%M")
+        keywords_found_new = list(set(keywords_found['new keywords']))
+        new_keywords = ', '.join(keywords_found_new)
+        keywords_found_old = list(set(keywords_found['old keywords']))
+        old_keywords = ', '.join(keywords_found_old)
+        date_and_time = dt.now().strftime("%Y_%m_%d_%H%M")
         file_name = date_and_time + '.html'
         save_path = self.root / 'user' / 'search_results' / file_name
         try:
@@ -101,20 +105,41 @@ class Session:
                                  <title>DonkeyFeed search results</title>
                                  </head>
                                 <body>
-                                <p><h1>Search terms found: {search_terms}</h1></p>
-                                <p><h2>Here are your search results for today:</h2></p>
                                 <p>You ran this search on {date}.</p>
-                               """.format(search_terms=keywords_found,
-                                          date=date_and_time))
-                for item in findings:
-                    file.write('<h3>{title}</h3>'.format(title=item['title']))
-                    file.write(
-                        '<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))
-                    file.write('<p>{summary}</p>'.format(summary=item['summary']))
-                    file.write('<p>---------------------------------</p>')
-                    file.write("""</body>
-                                </html>
-                                """)
+                               """.format(date=date_and_time))
+                if len(findings['new stuff']) == 0:
+                    file.write('<p><h2>New stuff: None found</h2></p>')
+                    file.write('<p>(No new stuff since your last search.)')
+                elif len(findings['new stuff']) > 0:
+                    file.write('<p><h2>New stuff:</h2></p>')
+                    file.write('<p>(findings that are new since your last search)</p>')
+                    file.write(f'<p>Keywords found: {new_keywords}</p>')
+                    for item in findings['new stuff']:
+                        file.write('<h3>{title}</h3>'.format(title=item['title']))
+                        file.write(
+                            '<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))
+                        file.write('<p>{summary}</p>'.format(summary=item['summary']))
+                        file.write('<p>---------------------------------</p>')
+                        file.write("""</body>
+                                    </html>
+                                    """)
+                    file.write('<p>**************************************</p>')
+                    file.write('<p>**************************************</p>')
+                if len(findings['old stuff']) > 0:
+                    file.write('<p><h2>Old stuff:</h2></p>')
+                    file.write('<p>(findings that were in the feed the last time you searched)</p>')
+                    file.write(f'<p>Keywords found: {old_keywords}</p>')
+
+                    for item in findings['old stuff']:
+                        file.write('<h3>{title}</h3>'.format(title=item['title']))
+                        file.write(
+                            '<p><a href="{link}">{link_text}</a></p>'.format(link=item['link'], link_text=item['link']))
+                        file.write('<p>{summary}</p>'.format(summary=item['summary']))
+                        file.write('<p>---------------------------------</p>')
+                file.write("""</body>
+                                            </html>
+                                            """
+                           )
             return save_path
         except Exception as e:
             print(f'Error writing to {save_path}: {e}')
@@ -122,29 +147,41 @@ class Session:
     # the idea of this being a separate function is to run through
     # all the filters, save them, and open the findings without pause
     def run_all_filters(self):
-        full_results = []
-        all_keywords_found = []
+        full_results = {'new stuff': [], 'old stuff': []}
+        all_keywords_found = {'new keywords': [], 'old keywords': []}
         for i in range(len(self.rosters.rosters_loaded[self.current_roster])):
             results = self.run_filter(i)
             if results is not None:
                 findings, keywords_found = results
-                full_results.extend(findings)
-                all_keywords_found.extend(keywords_found)
+                full_results['new stuff'].extend(findings['new stuff'])
+                full_results['old stuff'].extend(findings['old stuff'])
+                all_keywords_found['new keywords'].extend(keywords_found['new keywords'])
+                all_keywords_found['old keywords'].extend(keywords_found['old keywords'])
+        self.rosters.save()
         path = self.save_to_html(full_results, all_keywords_found)
         self.open_findings(path)
 
     def report_findings(self, findings, keywords, feed_name):
-        if len(findings) == 0:
+        if (len(findings['new stuff']) + len(findings['old stuff'])) == 0:
             print("Nothing found for these keywords in ", feed_name)
             self.spacer()
-        else:
-            print("Results were found for the following search terms:\n")
-            print(keywords)
-        for item in findings:  # loops through the list of dicts and prints the values
-            self.printer.default(item['title'])
-            print(item['link'])
-            self.printer.default(item['summary'])
-            print('--------------------------')
+            return False
+        elif len(findings['new stuff']) > 0:
+            print("New results were found for the following search terms:")
+            new_kw_set = set(keywords['new keywords'])
+            print(*new_kw_set, sep=', ' + '\n')
+            for item in findings['new stuff']:  # loops through the list of dicts and prints the values
+                self.printer.default(item['title'])
+                print(item['link'])
+                self.printer.default(item['summary'])
+                print('--------------------------')
+        elif len(findings['old stuff']) > 0:
+            print(
+                "No new entries since your last search, but some old "
+                "results were found for the following search terms:\n"
+            )
+            old_kw_set = set(keywords['old keywords'])
+            print(*old_kw_set, sep=', ')
 
     def open_findings(self, html_path):
         fullpath = os.path.join(self.root, html_path)
@@ -168,8 +205,13 @@ class Session:
             self.current_roster = 'general'
             print("All done! Roster deleted.")
 
+    def delete_timestamps(self):
+        zero_timestamp = dt.min.isoformat()
+        for rss_filter in self.rosters.rosters_loaded[self.current_roster]:
+            rss_filter['timestamp'] = zero_timestamp
+
     def remove_rss_feed(self, index_list):
-        print(index_list)
+        print(*index_list, sep=', ')
         if self.yesno('Are you sure you want to delete? y/n'):
             index_list.sort(reverse=True)
             for index in index_list:
@@ -277,7 +319,7 @@ exit                                Pretty self-explanatory IMO.
         while True:
             prompt = Command(self.rosters, self.current_roster)
             self.current_roster = prompt.roster_name
-            
+
             if prompt.command == 'run':
                 for index in prompt.index_list:
                     results = self.run_filter(index)
@@ -292,7 +334,6 @@ exit                                Pretty self-explanatory IMO.
                             path = self.save_to_html(findings, keywords_found)
                             if self.yesno('Do you want to view the results in a browser?'):
                                 self.open_findings(path)
-
             elif prompt.command == 'run special':
                 results = self.run_filter(prompt.index, prompt.keyword_list)
                 if results is not None:
@@ -326,6 +367,9 @@ exit                                Pretty self-explanatory IMO.
 
             elif prompt.command == 'delete all':
                 self.delete_all()
+
+            elif prompt.command == 'delete timestamps':
+                self.delete_timestamps()
 
             elif prompt.command == 'list':
                 self.list_rss_feeds()

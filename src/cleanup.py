@@ -1,19 +1,15 @@
-import os
-import xml.etree.ElementTree as ET
+from rss_roster import Rosters
+from datetime import datetime
 
+rosters = Rosters()
+zero_datetime = datetime.min
+print(zero_datetime)
 
-path = input('url? >> ')
+dictionary = {}
+dictionary['datetime'] = zero_datetime
+print(dictionary)
 
-# /home/peter/Downloads/subscriptions.xml
+for item in rosters.rosters_loaded['general']:
+    item['timestamp'] = zero_datetime.isoformat()
 
-check = os.path.exists(path)
-
-with open(path, 'r') as file:
-    tree = ET.parse(file)
-    root = tree.getroot()
-    for outline in root.findall('.//outline'):
-        if 'xmlUrl' in outline.attrib and 'title' in outline.attrib:
-            title = outline.attrib['title'].strip()
-            url = outline.attrib['xmlUrl'].strip()
-            print(title, ' : ', url)
-print(check)
+rosters.save()
