@@ -2,6 +2,7 @@ import pytest
 from styles import Prompter, Printer
 import os
 import validators
+from cluster_manager import Clusters
 
 # the Command class does some basic collecting and parsing of user
 # input and then instantiates:
@@ -28,10 +29,10 @@ import validators
 # - help
 
 class Command:
-    def __init__(self, rosters_class, current_roster):
+    def __init__(self, rosters_class, current_roster, current_cluster):
         self.arg_commands = [
             'run', 'roster', 'delete',
-            'add keywords', 'remove keywords', 'new'
+            'add keywords', 'remove keywords', 'new', 'cluster'
         ]
         self.solo_commands = [
             'help', 'exit', 'upload', 'list', 'upload', 'new'
@@ -42,6 +43,7 @@ class Command:
         self.args = None
         self.index = None
         self.rosters = rosters_class
+        self.clusters = Clusters()
         self.prompter = Prompter()
         self.printer = Printer()
         self.new_title = None
@@ -50,8 +52,10 @@ class Command:
         self.opml_path = None
         self.csv_path = None
         self.roster_name = current_roster
+        self.cluster_name = current_cluster
         self.roster_list = [key for key in self.rosters.rosters_loaded]
-        self.prompt(self.roster_name)
+        self.cluster_list = [key for key in self.clusters.clusters_loaded]
+        self.prompt(self.roster_name, self.cluster_name)
 
 # the following are a series of functions that can be called to process the user input
 
@@ -96,7 +100,7 @@ class Command:
         temp_list = string.split(',')
         for item in temp_list:
             item = item.strip()
-            if self.check_index(item) == False:
+            if not self.check_index(item):
                 return False
             else:
                 item = int(item)
@@ -187,11 +191,59 @@ class Command:
         self.command = 'remove keywords'
 
     def roster(self, args):
-        if self.set_roster(args) == False:
+        if args == 'list':
+            self.command = 'roster list'
+        elif self.set_roster(args) == False:
             print('Invalid roster.')
             return False
         else:
             self.command = 'roster'
+
+    def cluster(self, args):
+        args_list = ['list', 'off', 'new', 'add', 'remove', 'delete']
+        if args == 'list':
+            if self.cluster_name is None:
+                print('No keyword cluster loaded.')
+                return False
+            else:
+                self.command = 'cluster list'
+        elif args == 'off':
+            self.command = 'cluster off'
+        elif args == 'new':
+            while True:
+                name = self.prompter.default('Cluster name >>')
+                if name in args_list:
+                    print('Invalid cluster name')
+                elif name == 'cancel':
+                    return
+                else:
+                    break
+            keywords = self.prompter.default('Keywords, separated by commas >>')
+            self.make_list_strs(keywords)
+            self.cluster_name = name
+            self.command = 'cluster new'
+        elif args == 'delete':
+            self.command = 'cluster delete'
+        elif args == 'add':
+            if self.cluster_name is None:
+                print('No keyword cluster loaded.')
+            else:
+                keywords = self.prompter.default('Keywords to add >>')
+                self.make_list_strs(keywords)
+                self.command = 'cluster add'
+        elif args == 'remove':
+            if self.cluster_name is None:
+                print('No keyword cluster loaded.')
+            else:
+                keywords = self.prompter.default('Keywords to remove')
+                self.make_list_strs(keywords)
+                self.command = 'cluster remove'
+        elif self.args not in self.cluster_list:
+            print('Cluster not found.')
+            return False
+        else:
+            self.cluster_name = self.args
+            self.command = 'set cluster'
 
     def delete(self, args):
         if args and args[0:2] == '--':
@@ -203,12 +255,12 @@ class Command:
         elif args.strip() == '*':
             self.command = 'delete all'
             return
-        elif self.make_list_ints(args) is False:
-            print('Invalid index number.')
-            return False
         elif args.strip() == 'timestamps':
             self.command = 'delete timestamps'
             return
+        elif self.make_list_ints(args) is False:
+            print('Invalid index number.')
+            return False
         else:
             self.command = 'delete'
 
@@ -266,10 +318,13 @@ class Command:
         self.new_roster_name = roster_name
         self.command = 'new roster'
 
-    def prompt(self, current_roster):
+    def prompt(self, current_roster, current_cluster):
         self.index_list.clear()
         self.keyword_list.clear()
-        response = self.prompter.default(f"DonkeyFeed/{current_roster} >> ")
+        if current_cluster is None:
+            response = self.prompter.default(f"DonkeyFeed/{current_roster} >> ")
+        else:
+            response = self.prompter.default(f"DonkeyFeed/{current_roster}::{current_cluster} >> ")
 
         if not self.check_command(response):
             print('Invalid command or command format.')
@@ -290,6 +345,10 @@ class Command:
             else:
                 self.run(self.args)
                 return 'run'
+
+        elif command == 'cluster':
+            self.cluster(self.args)
+            return 'cluster'
 
         elif command == 'roster':
             self.roster(self.args)

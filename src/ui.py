@@ -6,14 +6,18 @@ from pathlib import Path
 from command_prompt import Command
 from styles import Printer, Prompter
 from RSS_parse import RSSfilter
+from cluster_manager import Clusters
 
 class Session:
 
     # grabs the roster
     def __init__(self, rosters):
         self.rosters = rosters
+        self.clusters = Clusters()
         self.current_roster = 'general'
+        self.current_cluster = None
         self.roster_list = self.get_roster_list()
+        self.cluster_list = self.get_cluster_list()
         self.printer = Printer()
         self.prompter = Prompter()
         self.root = Path(__file__).parent
@@ -21,6 +25,10 @@ class Session:
 
     def get_roster_list(self):
         list = [key for key in self.rosters.rosters_loaded]
+        return list
+
+    def get_cluster_list(self):
+        list = [key for key in self.clusters.clusters_loaded]
         return list
 
     def yesno(self, question):
@@ -55,10 +63,41 @@ class Session:
         print_roster = '  |  '.join(self.roster_list)
         self.printer.default(print_roster)
         self.printer.default('To change roster, enter: roster <roster name>\n')
+        self.printer.default('Your available clusters are: ')
+        print_roster = '  |  '.join(self.cluster_list)
+        self.printer.default(print_roster)
+        self.printer.default('To open a cluster, enter: cluster <roster name>\n')
+
+    def list_cluster(self, cluster_name):
+        keywords = ', '.join(self.clusters.clusters_loaded[cluster_name])
+        print('The keywords in the loaded cluster are:')
+        print(keywords)
+
+    def cluster_new(self, cluster_name, keywords):
+        self.clusters.new_cluster(cluster_name, keywords)
+        self.clusters.save_clusters()
+
+    def cluster_add(self, cluster_name, keywords):
+        self.clusters.add_keywords(cluster_name, keywords)
+        self.clusters.save_clusters()
+
+    def cluster_remove(self, cluster_name, keywords):
+        self.clusters.remove_keywords(cluster_name, keywords)
+        self.clusters.save_clusters()
+
+    def cluster_delete(self, cluster_name):
+        if self.yesno('Are you sure you want to delete the current cluster?'):
+            self.clusters.delete_cluster(cluster_name)
+            self.clusters.save_clusters()
+            self.current_cluster = None
+            self.cluster_list = self.get_cluster_list()
 
     def run_filter(self, index_num, keywords=None):
         if keywords is None:
-            keywords = self.rosters.rosters_loaded[self.current_roster][index_num]['keywords']
+            if self.current_cluster:
+                keywords = self.clusters.clusters_loaded[self.current_cluster]
+            else:
+                keywords = self.rosters.rosters_loaded[self.current_roster][index_num]['keywords']
         rss_parsed = RSSfilter(
             self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name'],
             self.rosters.rosters_loaded[self.current_roster][index_num]['URL'],
@@ -206,9 +245,11 @@ class Session:
             print("All done! Roster deleted.")
 
     def delete_timestamps(self):
-        zero_timestamp = dt.min.isoformat()
-        for rss_filter in self.rosters.rosters_loaded[self.current_roster]:
-            rss_filter['timestamp'] = zero_timestamp
+        if self.yesno('This will reset all the timestamps to zero. Are you sure? y/n'):
+            zero_timestamp = dt.min.isoformat()
+            for rss_filter in self.rosters.rosters_loaded[self.current_roster]:
+                rss_filter['timestamp'] = zero_timestamp
+            self.rosters.save()
 
     def remove_rss_feed(self, index_list):
         print(*index_list, sep=', ')
@@ -285,6 +326,9 @@ delete <index numbers>              Deletes one or more saved feed filters from 
                                     being separated by commas. (eg: 'delete 5, 8, 12')
 
 delete *                            This will delete the current roster. You cannot delete the 'general' roster.
+
+delete timestamps                   Resets all the timestamps in the current roster to zero. This means every entry in
+                                    the feed that matches the search keywords will be returned as a new match.
                                     
 add keywords <index number>         Adds one or more keywords to a feed filter in the current roster. 
                                     (eg: 'add keywords 8' where '8' is the index number of the feed filter where you 
@@ -317,8 +361,7 @@ exit                                Pretty self-explanatory IMO.
 
     def main_loop(self):
         while True:
-            prompt = Command(self.rosters, self.current_roster)
-            self.current_roster = prompt.roster_name
+            prompt = Command(self.rosters, self.current_roster, self.current_cluster)
 
             if prompt.command == 'run':
                 for index in prompt.index_list:
@@ -358,6 +401,27 @@ exit                                Pretty self-explanatory IMO.
 
             elif prompt.command == 'roster':
                 self.current_roster = prompt.roster_name
+
+            elif prompt.command == 'set cluster':
+                self.current_cluster = prompt.cluster_name
+
+            elif prompt.command == 'cluster list':
+                self.list_cluster(self.current_cluster)
+
+            elif prompt.command == 'cluster off':
+                self.current_cluster = None
+
+            elif prompt.command == 'cluster new':
+                self.cluster_new(prompt.cluster_name, prompt.keyword_list)
+
+            elif prompt.command == 'cluster add':
+                self.cluster_add(prompt.cluster_name, prompt.keyword_list)
+
+            elif prompt.command == 'cluster remove':
+                self.cluster_remove(prompt.cluster_name, prompt.keyword_list)
+
+            elif prompt.command == 'cluster delete':
+                self.cluster_delete(prompt.cluster_name)
 
             elif prompt.command == 'add keywords':
                 self.add_keywords(prompt.index, prompt.keyword_list)
