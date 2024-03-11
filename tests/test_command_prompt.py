@@ -5,6 +5,7 @@ src_dir = os.path.abspath(os.path.join(current_dir, '..', 'src'))
 sys.path.append(src_dir)
 
 from command_prompt import Command
+from cluster_manager import Clusters
 from unittest.mock import patch, MagicMock
 import random
 import pytest

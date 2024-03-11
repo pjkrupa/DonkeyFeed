@@ -21,7 +21,7 @@ class Session:
         self.printer = Printer()
         self.prompter = Prompter()
         self.root = Path(__file__).parent
-        self.timestamp = dt.now()
+        self.timestamp = dt.now().isoformat()
 
     def get_roster_list(self):
         list = [key for key in self.rosters.rosters_loaded]
@@ -93,8 +93,14 @@ class Session:
             self.cluster_list = self.get_cluster_list()
 
     def run_filter(self, index_num, keywords=None):
+        zero_timestamp = dt.min.isoformat()
+        feed_name = self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name']
+        if self.current_cluster is None:
+            cluster = feed_name
+        else:
+            cluster = self.current_cluster
         if keywords is None:
-            if self.current_cluster:
+            if self.current_cluster is None:
                 keywords = self.clusters.clusters_loaded[self.current_cluster]
             else:
                 keywords = self.rosters.rosters_loaded[self.current_roster][index_num]['keywords']
@@ -106,8 +112,10 @@ class Session:
         if rss_parsed.rss_dict is None:
             return
         rss_parsed.process()
-        rss_parsed.run_filter(self.rosters.rosters_loaded[self.current_roster][index_num]['timestamp'])
-        self.rosters.save_timestamp(self.current_roster, index_num, self.timestamp)
+        if cluster not in self.rosters.timestamps[self.current_roster][feed_name]:
+            self.rosters.timestamps[self.current_roster][feed_name][cluster] = zero_timestamp
+        rss_parsed.run_filter(self.rosters.timestamps[self.current_roster][feed_name][cluster])
+        self.rosters.timestamps[self.current_roster][feed_name][cluster] = self.timestamp
         if len(rss_parsed.findings['new stuff']) + len(rss_parsed.findings['old stuff']) == 0:
             print(
                 "Nothing found for these keywords in ",
@@ -133,7 +141,7 @@ class Session:
         new_keywords = ', '.join(keywords_found_new)
         keywords_found_old = list(set(keywords_found['old keywords']))
         old_keywords = ', '.join(keywords_found_old)
-        date_and_time = dt.now().strftime("%Y_%m_%d_%H%M")
+        date_and_time = dt.now().strftime("%m-%d-%Y at %H:%M")
         file_name = date_and_time + '.html'
         save_path = self.root / 'user' / 'search_results' / file_name
         try:
@@ -144,7 +152,7 @@ class Session:
                                  <title>DonkeyFeed search results</title>
                                  </head>
                                 <body>
-                                <p>You ran this search on {date}.</p>
+                                <p>Search results for {date}.</p>
                                """.format(date=date_and_time))
                 if len(findings['new stuff']) == 0:
                     file.write('<p><h2>New stuff: None found</h2></p>')
@@ -197,6 +205,7 @@ class Session:
                 all_keywords_found['new keywords'].extend(keywords_found['new keywords'])
                 all_keywords_found['old keywords'].extend(keywords_found['old keywords'])
         self.rosters.save()
+        self.rosters.save_timestamps()
         path = self.save_to_html(full_results, all_keywords_found)
         self.open_findings(path)
 
@@ -245,11 +254,12 @@ class Session:
             print("All done! Roster deleted.")
 
     def delete_timestamps(self):
-        if self.yesno('This will reset all the timestamps to zero. Are you sure? y/n'):
+        if self.yesno('This will reset all the timestamps in this roster to zero. Are you sure? y/n'):
             zero_timestamp = dt.min.isoformat()
-            for rss_filter in self.rosters.rosters_loaded[self.current_roster]:
-                rss_filter['timestamp'] = zero_timestamp
-            self.rosters.save()
+            for rss_feed in self.rosters.timestamps[self.current_roster]:
+                for key, value in enumerate(rss_feed):
+                    rss_feed[key] = zero_timestamp
+            self.rosters.save_timestamps()
 
     def remove_rss_feed(self, index_list):
         print(*index_list, sep=', ')
@@ -455,6 +465,8 @@ exit                                Pretty self-explanatory IMO.
 
             elif prompt.command == 'readme':
                 self.printer.red("Sorry, haven't finished it yet!!")
+
+            self.rosters.save_timestamps()
 
 
 

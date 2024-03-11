@@ -4,18 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added a 'cluster' feature so users can run RSS feeds against preset keyword lists">
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_07_2138.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_07_2140.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_08_0844.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_08_0923.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_08_0926.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_23_1029.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_23_1246.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_26_1043.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_27_0714.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_27_1052.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/user/search_results/2024_02_27_1544.html" beforeDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="clearing out some saved HTML searches">
+      <change afterPath="$PROJECT_DIR$/src/user/schema-timestamps.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_10_1324.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_11_1347.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/2024_03_11_1348.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/timestamps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cleanup.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/cleanup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rss_roster.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rss_roster.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/user/RSS feed filters.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/user/RSS feed filters.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/user/keyword clusters.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/user/keyword clusters.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_command_prompt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,7 +146,7 @@
       <recent name="$PROJECT_DIR$/main/user" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_command_prompt.test_check_commands_with_args">
+  <component name="RunManager">
     <configuration name="Python tests for test_command_prompt.test_check_commands_with_args" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="DonkeyFeed" />
       <option name="ENV_FILES" value="" />
@@ -479,7 +480,15 @@
       <option name="project" value="LOCAL" />
       <updated>1709901905279</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="clearing out some saved HTML searches">
+      <option name="closed" value="true" />
+      <created>1709903493255</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1709903493255</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -520,7 +529,8 @@
     <MESSAGE value="finished unit tests for command_prompt.py" />
     <MESSAGE value="added a timestamp so users can see if an RSS feed has been updated since last search" />
     <MESSAGE value="added a 'cluster' feature so users can run RSS feeds against preset keyword lists" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a 'cluster' feature so users can run RSS feeds against preset keyword lists" />
+    <MESSAGE value="clearing out some saved HTML searches" />
+    <option name="LAST_COMMIT_MESSAGE" value="clearing out some saved HTML searches" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
