@@ -11,6 +11,9 @@ import random
 import pytest
 from typing import List
 
+class MockClusters:
+    def __init__(self):
+        self.clusters_loaded = {"GenAI": ["OpenAI", "Sam Altman", "Mistral", "Hugging Face", "RAG"]}
 
 # i need a mock of a rosters class
 class MockRosters:
@@ -73,11 +76,7 @@ class MockRosters:
                 }
             ]
         }
-# these should test parameters that fail. ie: bad commands
-# @pytest.fixture(params=[
-#                 'run all 12',
-#                 'run all --Charter'
-# ])
+
 
 @pytest.fixture
 def mock_prompt():
@@ -87,7 +86,8 @@ def mock_prompt():
 @pytest.fixture
 def command_instance(mock_prompt):
     mock_rosters_instance = MockRosters()
-    return Command(mock_rosters_instance, 'general')
+    mock_clusters_instance = MockClusters()
+    return Command(mock_rosters_instance, 'general', None)
 
 @pytest.fixture
 def commands_with_arguments(command_instance) -> List[str]:
@@ -206,21 +206,6 @@ def test_run_valid_indexes(command_instance):
     assert (command_instance.index_list == [0, 2]
             and command_instance.command == 'run')
 
-def test_run_special_valid_index(command_instance, monkeypatch):
-    with patch('builtins.input', return_value='test, blah, blerg'):
-        command_instance.run_special('2')
-        assert command_instance.keyword_list == ['test', 'blah', 'blerg']
-
-def test_run_special_invalid_index(command_instance, monkeypatch):
-    with patch('builtins.input', return_value='test, blah, blerg'):
-        assert (command_instance.run_special('20') == False
-                and command_instance.command is None)
-
-def test_run_special_empty_keywords(command_instance, monkeypatch):
-    with patch('builtins.input', return_value=''):
-        command_instance.run_special('2')
-        assert command_instance.keyword_list == ['']
-
 def test_remove_keywords_valid_index_number(command_instance, monkeypatch):
     with (patch('builtins.input', return_value='a, b, c')):
         command_instance.remove_keywords('2')
@@ -235,6 +220,28 @@ def test_remove_keywords_invalid_index_number(command_instance, monkeypatch):
                 and command_instance.command is None)
         assert (command_instance.remove_keywords('1, 2, 3') is False
                 and command_instance.command is None)
+
+def test_cluster_with_cluster_loaded(command_instance, monkeypatch):
+    with patch.object(command_instance, 'cluster_name', 'GenAI'):
+        command_instance.cluster('list')
+        assert command_instance.command == 'cluster list'
+
+def test_cluster_no_cluster_loaded(command_instance, monkeypatch):
+    with patch.object(command_instance, 'cluster_name', None):
+        assert command_instance.cluster('list') is False
+
+
+def test_cluster_new_valid_input(command_instance, monkeypatch):
+    with patch.object(command_instance, 'cluster_name', 'GenAI'), \
+            patch('builtins.input', side_effect=['valid cluster', 'bink, bonk, boink']):
+        command_instance.cluster('new')
+        assert command_instance.command == 'cluster new'
+        assert command_instance.keyword_list == ['bink', 'bonk', 'boink']
+
+# def test_cluster_new_invalid_input(command_instance, monkeypatch):
+#     with patch.object(command_instance, 'cluster_name', 'GenAI'), \
+#             patch('builtins.input', side_effect=['valid cluster', 'bink, bonk, boink']):
+#         command_instance.cluster('new')
 
 def test_delete_valid_args(command_instance):
     command_instance.delete('--0,2')
@@ -334,69 +341,64 @@ def test_upload_bad_path(mock_exists, command_instance):
     with patch('builtins.input', return_value='test_file.csv'):
         assert command_instance.upload() is False
 
-def test_prompt_valid_command(monkeypatch):
+@pytest.mark.parametrize("input_string", [
+    'run 0',
+    'run --general 0',
+    'run 0,1',
+    'run --0,2'
+])
+def test_prompt_valid_command(monkeypatch, input_string):
     mock_rosters = MockRosters()
-    with patch('builtins.input', return_value='run 0'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'run'
+    with patch('builtins.input', return_value=input_string):
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'run'
 
-    with patch('builtins.input', return_value='run --general 0'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'run'
-
-    with patch('builtins.input', return_value='run 0,1'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'run'
-
-    with patch('builtins.input', return_value='run --0,2'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'run'
-
-def test_prompt_invalid_command(monkeypatch):
+@pytest.mark.parametrize("input_string", [
+    'runk 0',
+    'run'
+])
+def test_prompt_invalid_command(monkeypatch, input_string):
     mock_rosters = MockRosters()
-    with patch('builtins.input', return_value='runk 0'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) is False
-    with patch('builtins.input', return_value='run'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) is False
+    with patch('builtins.input', return_value=input_string):
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') is False
 
 @patch('command_prompt.Command.new')
 def test_prompt_response_new(mock_new, monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='new'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'new'
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'new'
 
 def test_prompt_response_list(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='list'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'list'
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'list'
     with patch('builtins.input', return_value='exit'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'exit'
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'exit'
 
 def test_prompt_response_exit(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='exit'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'exit'
+        command_instance = Command(mock_rosters, 'general','GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'exit'
 
 def test_prompt_response_help(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='help'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'help'
+        command_instance = Command(mock_rosters, 'general','GenAI')
+        assert command_instance.prompt(command_instance.roster_name,'GenAI') == 'help'
 
 def test_prompt_response_upload(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='upload'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'upload'
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'upload'
 
 def test_prompt_response_new_roster(monkeypatch):
     mock_rosters = MockRosters()
     with patch('builtins.input', return_value='new roster'):
-        command_instance = Command(mock_rosters, 'general')
-        assert command_instance.prompt(command_instance.roster_name) == 'new roster'
+        command_instance = Command(mock_rosters, 'general', 'GenAI')
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'new roster'

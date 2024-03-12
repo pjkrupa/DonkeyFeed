@@ -12,7 +12,6 @@ from cluster_manager import Clusters
 # format for running commands is:
 
 # - run <index numbers, separated by commas>
-# - run special <index numbers, separated by commas>
 #   prompt "keywords, separated by commas >> "
 # - run all
 # - delete <index numbers, separated by commas>
@@ -68,8 +67,6 @@ class Command:
         for command in self.solo_commands:
             if string.lower() == command:
                 return command, None
-
-
         return False
 
 # strips characters from the beginning of a string based on the length of chars
@@ -172,14 +169,6 @@ class Command:
             return False
         else:
             self.command = 'run'
-        
-    def run_special(self, args):
-        if self.check_index(args) is False:
-            print('Invalid index number.')
-            return False
-        self.command = 'run special'
-        keyword_string = self.prompter.default('Keywords, separated by commas >> ')
-        self.make_list_strs(keyword_string)
 
     def remove_keywords(self, args):
         if self.check_index(args) == False:
@@ -207,33 +196,44 @@ class Command:
                 return False
             else:
                 self.command = 'cluster list'
+
         elif args == 'off':
             self.command = 'cluster off'
+
         elif args == 'new':
             while True:
                 name = self.prompter.default('Cluster name >>')
                 if name in args_list:
                     print('Invalid cluster name')
+                    return False
+                elif name in self.cluster_list:
+                    print('Cluster name already in use.')
+                    return False
                 elif name == 'cancel':
-                    return
+                    return False
                 else:
                     break
             keywords = self.prompter.default('Keywords, separated by commas >>')
             self.make_list_strs(keywords)
             self.cluster_name = name
             self.command = 'cluster new'
+
         elif args == 'delete':
             self.command = 'cluster delete'
+
         elif args == 'add':
             if self.cluster_name is None:
                 print('No keyword cluster loaded.')
+                return False
             else:
                 keywords = self.prompter.default('Keywords to add >>')
                 self.make_list_strs(keywords)
                 self.command = 'cluster add'
+
         elif args == 'remove':
             if self.cluster_name is None:
                 print('No keyword cluster loaded.')
+                False
             else:
                 keywords = self.prompter.default('Keywords to remove')
                 self.make_list_strs(keywords)
@@ -336,10 +336,6 @@ class Command:
             if self.args == '':
                 print('Needs an index number')
                 return False
-            elif self.args.startswith('special'):
-                self.args = self.args.strip('special')
-                self.run_special(self.args)
-                return 'run'
             elif self.args == 'all':
                 self.command = 'run all'
             else:

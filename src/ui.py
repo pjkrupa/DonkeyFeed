@@ -320,12 +320,6 @@ run all                             The nuclear option. This runs every filter i
                                     results to an HTML file, and opens it in your default browser. A quick and easy way 
                                     to run all the saved feed filters on a roster at once.
                                     
-run special <index number>          This is for running a saved RSS feed with new keywords that you haven't saved yet. 
-                                    This command can only run one filter at a time (eg: 'run special 5', where '5' is
-                                    the index number of the feed you want to run). You will then be prompted to enter 
-                                    your search keywords separated by commas. After running the filter, you will have the 
-                                    option to add the new keywords to your saved filter.
-                                    
 new                                 Saves a new RSS feed filter to the roster. You will be prompted for the name and URL 
                                     address of the RSS feed, and the keywords for the filter, separated by commas.
                                     
@@ -374,6 +368,7 @@ exit                                Pretty self-explanatory IMO.
             prompt = Command(self.rosters, self.current_roster, self.current_cluster)
 
             if prompt.command == 'run':
+                print(self.current_cluster)
                 for index in prompt.index_list:
                     results = self.run_filter(index)
                     if results is not None:
@@ -387,18 +382,6 @@ exit                                Pretty self-explanatory IMO.
                             path = self.save_to_html(findings, keywords_found)
                             if self.yesno('Do you want to view the results in a browser?'):
                                 self.open_findings(path)
-            elif prompt.command == 'run special':
-                results = self.run_filter(prompt.index, prompt.keyword_list)
-                if results is not None:
-                    findings, keywords_found = results
-                    self.report_findings(findings, keywords_found, prompt.roster_name)
-                    if self.yesno('Do you want to save these results? >> '):
-                        path = self.save_to_html(findings, keywords_found)
-                        if self.yesno('Do you want to view the results in a browser? >> '):
-                            self.open_findings(path)
-                        if self.yesno('Do you want to save these keywords to your filter? >> '):
-                            self.rosters.add_keywords(prompt.index, prompt.keyword_list)
-                            self.printer.default('All set!\n')
 
             elif prompt.command == 'run all':
                 self.run_all_filters()
