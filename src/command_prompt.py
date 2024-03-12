@@ -34,7 +34,7 @@ class Command:
             'add keywords', 'remove keywords', 'new', 'cluster'
         ]
         self.solo_commands = [
-            'help', 'exit', 'upload', 'list', 'upload', 'new'
+            'help', 'exit', 'import', 'list', 'new', 'export'
         ]
         self.index_list = []
         self.keyword_list = []
@@ -294,7 +294,7 @@ class Command:
         print(self.keyword_list)
         self.command = 'add keywords'
 
-    def upload(self):
+    def import_file(self):
         path = self.prompter.default('File path >> ').strip()
         print(path)
         result = os.path.exists(path)
@@ -303,10 +303,10 @@ class Command:
             self.printer.default('File not found.')
             return False
         elif path.endswith('.csv'):
-            self.command = 'upload csv'
+            self.command = 'import csv'
             self.csv_path = path
         elif path.endswith('.opml') or path.endswith('.xml'):
-            self.command = 'upload opml'
+            self.command = 'import opml'
             self.opml_path = path
         else:
             self.printer.default('Invalid file type, must be a CSV or OPML (XML).')
@@ -374,9 +374,13 @@ class Command:
             self.remove_keywords(self.args)
             return 'remove keywords'
 
-        elif command == 'upload':
-            self.upload()
-            return 'upload'
+        elif command == 'import':
+            self.import_file()
+            return 'import'
+
+        elif command == 'export':
+            self.command = 'export'
+            return 'export'
 
         elif command == 'help':
             self.command = command

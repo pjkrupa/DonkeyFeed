@@ -34,7 +34,7 @@ class Session:
     def yesno(self, question):
         while True:
             ans_list = ['y', 'n']
-            ans = self.prompter.default(question + ' >> ').lower()
+            ans = self.prompter.default(question + ' y/n >> ').lower()
             if ans not in ans_list:
                 self.printer.red('Try again.')
             elif ans == 'n':
@@ -101,9 +101,10 @@ class Session:
             cluster = self.current_cluster
         if keywords is None:
             if self.current_cluster is None:
-                keywords = self.clusters.clusters_loaded[self.current_cluster]
-            else:
                 keywords = self.rosters.rosters_loaded[self.current_roster][index_num]['keywords']
+            else:
+                keywords = self.clusters.clusters_loaded[self.current_cluster]
+
         rss_parsed = RSSfilter(
             self.rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name'],
             self.rosters.rosters_loaded[self.current_roster][index_num]['URL'],
@@ -124,17 +125,24 @@ class Session:
         else:
             return rss_parsed.findings, rss_parsed.keywords_found
 
-    def upload_csv(self, path, roster_name):
-        self.rosters.upload_csv(path, roster_name)
+    def import_csv(self, path, roster_name):
+        self.rosters.import_csv(path, roster_name)
         self.rosters.save()
         self.roster_list = self.get_roster_list()
         self.prompter.default('All done. Press <return> to continue.')
 
-    def upload_opml(self, path, roster_name):
-        self.rosters.upload_opml(path, roster_name)
+    def import_opml(self, path, roster_name):
+        self.rosters.import_opml(path, roster_name)
         self.rosters.save()
         self.roster_list = self.get_roster_list()
         self.prompter.default('All done. Press <return> to continue.')
+
+    def export_file(self):
+        if self.yesno('This will export your current roster to a .CSV file. Go ahead?'):
+            path = self.rosters.export_csv(self.current_roster)
+            print(f'All done! Your roster has been exported and saved at {path}')
+        else:
+            return False
 
     def save_to_html(self, findings, keywords_found):
         keywords_found_new = list(set(keywords_found['new keywords']))
@@ -246,7 +254,7 @@ class Session:
         if self.current_roster == 'general':
             print("You can't delete the 'general' roster.")
             return False
-        if self.yesno(f'Are you sure you want to delete the entire {self.current_roster} roster? y/n'):
+        if self.yesno(f'Are you sure you want to delete the entire {self.current_roster} roster?'):
             self.rosters.delete_roster(self.current_roster)
             self.rosters.save()
             self.roster_list = self.get_roster_list()
@@ -254,7 +262,7 @@ class Session:
             print("All done! Roster deleted.")
 
     def delete_timestamps(self):
-        if self.yesno('This will reset all the timestamps in this roster to zero. Are you sure? y/n'):
+        if self.yesno('This will reset all the timestamps in this roster to zero. Are you sure?'):
             zero_timestamp = dt.min.isoformat()
             for rss_feed in self.rosters.timestamps[self.current_roster]:
                 for key, value in enumerate(rss_feed):
@@ -263,7 +271,7 @@ class Session:
 
     def remove_rss_feed(self, index_list):
         print(*index_list, sep=', ')
-        if self.yesno('Are you sure you want to delete? y/n'):
+        if self.yesno('Are you sure you want to delete?'):
             index_list.sort(reverse=True)
             for index in index_list:
                 self.rosters.remove_rss_feed(index, self.current_roster)
@@ -324,7 +332,7 @@ new                                 Saves a new RSS feed filter to the roster. Y
                                     address of the RSS feed, and the keywords for the filter, separated by commas.
                                     
 new roster                          Creates a new roster. You can then add to the roster using the 'new' command or the
-                                    'upload' command.
+                                    'import' command.
                                     
 delete <index numbers>              Deletes one or more saved feed filters from the roster, with multiple index numbers
                                     being separated by commas. (eg: 'delete 5, 8, 12')
@@ -342,7 +350,7 @@ add keywords <index number>         Adds one or more keywords to a feed filter i
 remove keywords <index number>      Same as 'add keywords,' but for removing keywords from a saved feed filter in the 
                                     current roster. 
                                 
-upload                              This is self for uploading a .CSV or an .OPML file containing your RSS feeds for 
+import                              This is self for importing a .CSV or an .OPML file containing your RSS feeds for 
                                     filtering. For a .CSV file, the format should be as follows:
                                     -----------------------------------------------------------------------------------
                                     Column1             Column2         Column3         Column4         ColumnN+1     
@@ -355,7 +363,10 @@ upload                              This is self for uploading a .CSV or an .OPM
                                     (You can also save an RSS feed with a URL and add keywords later.)
                                     
                                     .OPML files can end in .OPML or .XML, and you have to add your keywords to the 
-                                    filters in the roster after upload. 
+                                    filters in the roster after import. 
+
+export                              This will save your current roster as a .CSV file. You can then edit your roster
+                                    easily by adding feeds and keywords, then re-import it. 
 
 exit                                Pretty self-explanatory IMO.                                                           
         """)
@@ -431,11 +442,14 @@ exit                                Pretty self-explanatory IMO.
             elif prompt.command == 'list':
                 self.list_rss_feeds()
 
-            elif prompt.command == 'upload csv':
-                self.upload_csv(prompt.csv_path, self.current_roster)
+            elif prompt.command == 'import csv':
+                self.import_csv(prompt.csv_path, self.current_roster)
 
-            elif prompt.command == 'upload opml':
-                self.upload_opml(prompt.opml_path, self.current_roster)
+            elif prompt.command == 'import opml':
+                self.import_opml(prompt.opml_path, self.current_roster)
+
+            elif prompt.command == 'export':
+                self.export_file()
 
             elif prompt.command == 'new roster':
                 self.new_roster(prompt.new_roster_name)

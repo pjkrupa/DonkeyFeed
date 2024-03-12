@@ -4,11 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added a separate timestamp log so timestamps are logged correctly whether using the filter keywords or a keyword cluster.">
-      <change afterPath="$PROJECT_DIR$/src/user/search_results/03-11-2024 at 19:56.html" afterDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="changed language from upload/download to import/export, added ability to export a roster to a .CSV.">
+      <change afterPath="$PROJECT_DIR$/src/user/ai chatter.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/general.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/03-12-2024 at 07:50.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/03-12-2024 at 07:55.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/03-12-2024 at 07:56.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/command_prompt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/rss_roster.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/rss_roster.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/ui.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ui.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/user/RSS feed filters.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/user/RSS feed filters.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/user/timestamps.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/user/timestamps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tests/test_command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_command_prompt.py" afterDir="false" />
     </list>
@@ -41,90 +47,91 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_add_keywords_invalid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_add_keywords_valid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_bad_command.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_commands_with_args.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_index.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_index_for_setting_global_index_variable.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_index_with_bad_index.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_index_with_good_index.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_check_solo_commands.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_cluster.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_cluster_new_valid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_cluster_no_cluster_loaded.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_delete.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_delete_invalid_args.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_delete_valid_args.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_make_list_ints_with_invalid_indexes.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_make_list_ints_with_valid_indexes.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_make_list_strs.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_make_list_strs_True.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_new.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_new_cancel.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_new_invalid_url.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_new_url_cancel.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_new_valid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_invalid_command.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_exit.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_help.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_list.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_new.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_new_roster.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_response_upload.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_valid_command.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_prompt_valid_command_without_args.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_remove_keywords_invalid_index_number.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_remove_keywords_valid_index_number.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_roster_pick_with_cancel.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_roster_pick_with_new_roster_name.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_roster_pick_with_no_roster_name.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_roster_pick_with_valid_roster_name.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_run.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_run_special_empty_keywords.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_run_special_invalid_index.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_run_special_valid_index.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_run_valid_indexes.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_set_range_invalid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_set_range_valid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_set_roster_pass.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_set_roster_with_invalid_roster_name.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_set_roster_with_valid_roster_name.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_strip_characters.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_upload_bad_path.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_upload_invalid_input.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_upload_valid_input_csv.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests for test_command_prompt.test_upload_valid_input_opml.executor&quot;: &quot;Run&quot;,
-    &quot;Python tests.Python tests in test_command_prompt.py.executor&quot;: &quot;Run&quot;,
-    &quot;Python.RSS_parse.executor&quot;: &quot;Run&quot;,
-    &quot;Python.__init__.executor&quot;: &quot;Run&quot;,
-    &quot;Python.cleanup.executor&quot;: &quot;Run&quot;,
-    &quot;Python.command_prompt.executor&quot;: &quot;Run&quot;,
-    &quot;Python.config.executor&quot;: &quot;Run&quot;,
-    &quot;Python.donkeyfeed.executor&quot;: &quot;Run&quot;,
-    &quot;Python.gui.executor&quot;: &quot;Run&quot;,
-    &quot;Python.main.executor&quot;: &quot;Run&quot;,
-    &quot;Python.play.executor&quot;: &quot;Run&quot;,
-    &quot;Python.rss_roster.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.scratch.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_RSS_parse.executor&quot;: &quot;Run&quot;,
-    &quot;Python.test_database.executor&quot;: &quot;Run&quot;,
-    &quot;Python.ui.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/peter/PycharmProjects/DonkeyFeed&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "Python tests.Python tests for test_command_prompt.test_add_keywords_invalid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_add_keywords_valid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_bad_command.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_commands_with_args.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_index.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_index_for_setting_global_index_variable.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_index_with_bad_index.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_index_with_good_index.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_check_solo_commands.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_cluster.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_cluster_new_valid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_cluster_no_cluster_loaded.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_delete.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_delete_invalid_args.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_delete_valid_args.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_export_valid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_make_list_ints_with_invalid_indexes.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_make_list_ints_with_valid_indexes.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_make_list_strs.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_make_list_strs_True.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_new.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_new_cancel.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_new_invalid_url.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_new_url_cancel.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_new_valid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_invalid_command.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_exit.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_help.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_list.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_new.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_new_roster.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_response_upload.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_valid_command.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_prompt_valid_command_without_args.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_remove_keywords_invalid_index_number.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_remove_keywords_valid_index_number.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_roster_pick_with_cancel.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_roster_pick_with_new_roster_name.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_roster_pick_with_no_roster_name.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_roster_pick_with_valid_roster_name.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_run.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_run_special_empty_keywords.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_run_special_invalid_index.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_run_special_valid_index.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_run_valid_indexes.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_set_range_invalid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_set_range_valid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_set_roster_pass.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_set_roster_with_invalid_roster_name.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_set_roster_with_valid_roster_name.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_strip_characters.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_upload_bad_path.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_upload_invalid_input.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_upload_valid_input_csv.executor": "Run",
+    "Python tests.Python tests for test_command_prompt.test_upload_valid_input_opml.executor": "Run",
+    "Python tests.Python tests in test_command_prompt.py.executor": "Run",
+    "Python.RSS_parse.executor": "Run",
+    "Python.__init__.executor": "Run",
+    "Python.cleanup.executor": "Run",
+    "Python.command_prompt.executor": "Run",
+    "Python.config.executor": "Run",
+    "Python.donkeyfeed.executor": "Run",
+    "Python.gui.executor": "Run",
+    "Python.main.executor": "Run",
+    "Python.play.executor": "Run",
+    "Python.rss_roster.executor": "Debug",
+    "Python.scratch.executor": "Run",
+    "Python.test_RSS_parse.executor": "Run",
+    "Python.test_database.executor": "Run",
+    "Python.ui.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/peter/PycharmProjects/DonkeyFeed",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
     ]
   }
-}</component>
+}]]></component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings>
@@ -143,7 +150,7 @@
       <recent name="$PROJECT_DIR$/main/user" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_command_prompt.test_cluster">
+  <component name="RunManager">
     <configuration name="Python tests for test_command_prompt.test_cluster" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="DonkeyFeed" />
       <option name="ENV_FILES" value="" />
@@ -189,6 +196,21 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_command_prompt.test_export_valid_input" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DonkeyFeed" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_command_prompt.test_export_valid_input&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
     <configuration name="Python tests for test_command_prompt.test_prompt_response_new_roster" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="DonkeyFeed" />
       <option name="ENV_FILES" value="" />
@@ -204,28 +226,13 @@
       <option name="_new_targetType" value="&quot;PYTHON&quot;" />
       <method v="2" />
     </configuration>
-    <configuration name="Python tests for test_command_prompt.test_prompt_response_upload" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
-      <module name="DonkeyFeed" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;test_command_prompt.test_prompt_response_upload&quot;" />
-      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
-      <method v="2" />
-    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python tests.Python tests for test_command_prompt.test_export_valid_input" />
         <item itemvalue="Python tests.Python tests for test_command_prompt.test_cluster_new_valid_input" />
         <item itemvalue="Python tests.Python tests for test_command_prompt.test_cluster_no_cluster_loaded" />
         <item itemvalue="Python tests.Python tests for test_command_prompt.test_cluster" />
         <item itemvalue="Python tests.Python tests for test_command_prompt.test_prompt_response_new_roster" />
-        <item itemvalue="Python tests.Python tests for test_command_prompt.test_prompt_response_upload" />
       </list>
     </recent_temporary>
   </component>
@@ -493,7 +500,15 @@
       <option name="project" value="LOCAL" />
       <updated>1710165465725</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="removed the &quot;run special&quot; command (seems unnecessary), added unit tests for clusters method">
+      <option name="closed" value="true" />
+      <created>1710225859953</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1710225859953</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -512,7 +527,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="first commit!" />
     <MESSAGE value="added a class for RSS parsing" />
     <MESSAGE value="finished RSS parser. it now saves files." />
     <MESSAGE value="set up a config file" />
@@ -536,14 +550,16 @@
     <MESSAGE value="added a 'cluster' feature so users can run RSS feeds against preset keyword lists" />
     <MESSAGE value="clearing out some saved HTML searches" />
     <MESSAGE value="added a separate timestamp log so timestamps are logged correctly whether using the filter keywords or a keyword cluster." />
-    <option name="LAST_COMMIT_MESSAGE" value="added a separate timestamp log so timestamps are logged correctly whether using the filter keywords or a keyword cluster." />
+    <MESSAGE value="removed the &quot;run special&quot; command (seems unnecessary), added unit tests for clusters method" />
+    <MESSAGE value="changed language from upload/download to import/export, added ability to export a roster to a .CSV." />
+    <option name="LAST_COMMIT_MESSAGE" value="changed language from upload/download to import/export, added ability to export a roster to a .CSV." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/ui.py</url>
-          <line>370</line>
+          <line>381</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -560,6 +576,16 @@
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
           <line>243</line>
           <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
+          <line>344</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
+          <line>343</line>
+          <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

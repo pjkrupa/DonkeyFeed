@@ -316,30 +316,33 @@ def test_add_keywords_invalid_input(command_instance, monkeypatch):
                 and command_instance.keyword_list == [])
 
 @patch('os.path.exists', return_value=True)
-def test_upload_valid_input_opml(mock_exists, command_instance):
+def test_import_valid_input_opml(mock_exists, command_instance):
     test_opml = ['test_file.xml', 'test_file.opml']
     for value in test_opml:
         with patch('builtins.input', return_value=value):
-            command_instance.upload()
-            assert command_instance.command == 'upload opml'
+            command_instance.import_file()
+            assert command_instance.command == 'import opml'
             assert command_instance.opml_path == value
 
 @patch('os.path.exists', return_value=True)
-def test_upload_valid_input_csv(mock_exists, command_instance):
+def test_import_valid_input_csv(mock_exists, command_instance):
     with patch('builtins.input', return_value='test_file.csv'):
-        command_instance.upload()
-        assert command_instance.command == 'upload csv'
+        command_instance.import_file()
+        assert command_instance.command == 'import csv'
         assert command_instance.csv_path == 'test_file.csv'
 
 @patch('os.path.exists', return_value=True)
-def test_upload_invalid_input(mock_exists, command_instance):
+def test_import_invalid_input(mock_exists, command_instance):
     with patch('builtins.input', return_value='test_file.txt'):
-        assert command_instance.upload() is False
+        assert command_instance.import_file() is False
 
 @patch('os.path.exists', return_value=False)
-def test_upload_bad_path(mock_exists, command_instance):
+def test_import_bad_path(mock_exists, command_instance):
     with patch('builtins.input', return_value='test_file.csv'):
-        assert command_instance.upload() is False
+        assert command_instance.import_file() is False
+
+def test_export_valid_input(command_instance):
+    pass
 
 @pytest.mark.parametrize("input_string", [
     'run 0',
@@ -391,11 +394,11 @@ def test_prompt_response_help(monkeypatch):
         command_instance = Command(mock_rosters, 'general','GenAI')
         assert command_instance.prompt(command_instance.roster_name,'GenAI') == 'help'
 
-def test_prompt_response_upload(monkeypatch):
+def test_prompt_response_import(monkeypatch):
     mock_rosters = MockRosters()
-    with patch('builtins.input', return_value='upload'):
+    with patch('builtins.input', return_value='import'):
         command_instance = Command(mock_rosters, 'general', 'GenAI')
-        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'upload'
+        assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'import'
 
 def test_prompt_response_new_roster(monkeypatch):
     mock_rosters = MockRosters()

@@ -82,7 +82,7 @@ class Rosters:
     def delete_roster(self, roster_name):
         del self.rosters_loaded[roster_name]
 
-    def upload_csv(self, path, roster_name):
+    def import_csv(self, path, roster_name):
         if roster_name not in self.rosters_loaded:
             self.rosters_loaded[roster_name] = []
         with open(path) as csvfile:
@@ -95,7 +95,7 @@ class Rosters:
                     del row[0:2]
                     self.add_rss_feed(title, url, row, roster_name)
 
-    def upload_opml(self, path, roster_name):
+    def import_opml(self, path, roster_name):
         if roster_name not in self.rosters_loaded:
             self.rosters_loaded[roster_name] = []
         with open(path, 'r') as file:
@@ -106,3 +106,18 @@ class Rosters:
                     title = outline.attrib['title'].strip()
                     url = outline.attrib['xmlUrl'].strip()
                     self.add_rss_feed(title, url, [], roster_name)
+
+    def export_csv(self, roster_name):
+        file_name = roster_name + '.csv'
+        path = Path(__file__).parent / 'user'
+        save_path = path / file_name
+        with open(save_path, 'w') as csvfile:
+            csvwriter = csv.writer(csvfile)
+            for entry in self.rosters_loaded[roster_name]:
+                flattened_entry = []
+                flattened_entry.append(entry['RSS feed name'])
+                flattened_entry.append(entry['URL'])
+                for item in entry['keywords']:
+                    flattened_entry.append(item)
+                csvwriter.writerow(flattened_entry)
+        return save_path
