@@ -33,6 +33,38 @@ class Utilities:
             else:
                 return True
 
+    def make_list_ints(self, rosters, string):
+        index_list = []
+        temp_list = string.split(',')
+        for item in temp_list:
+            item = item.strip()
+            if not self.check_index(rosters, item):
+                return False
+            else:
+                item = int(item)
+                index_list.append(item)
+                return index_list
+
+    def make_list_strs(self, string):
+        keywords_list = []
+        temp_list = string.split(',')
+        for item in temp_list:
+            item = item.strip()
+            keywords_list.append(item)
+        return keywords_list
+
+    def check_index(self, rosters, index):
+        try:
+            index = int(index)
+        except ValueError:
+            return False
+        except TypeError:
+            return False
+        if index < 0 or index > len(rosters.rosters_loaded[self.current_roster]):
+            return False
+        else:
+            return True
+
     # a method for printing out the roster
     # 'rosters' and 'clusters are the class objects that should be given every time this is called
     def list_rss_feeds(self, rosters, clusters):

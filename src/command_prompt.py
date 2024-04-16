@@ -52,32 +52,6 @@ class Command1(cmd.Cmd):
             prompt = f'DonkeyFeed/{self.current_roster} >> '
             return prompt
 
-    def check_index(self, index) -> bool:
-        try:
-            index = int(index)
-        except ValueError:
-            return False
-        except TypeError:
-            return False
-        if index < 0 or index > len(self.rosters.rosters_loaded[self.current_roster]):
-            return False
-        else:
-            self.index = index
-            return True
-
-    def make_list_ints(self, string):
-        index_list = []
-        temp_list = string.split(',')
-        for item in temp_list:
-            item = item.strip()
-            if not self.check_index(item):
-                return False
-            else:
-                item = int(item)
-                index_list.append(item)
-        self.index_list = index_list
-        return True
-
     def do_run(self, args):
         if self.make_list_ints(args):
             pass # call the function that runs RSS filters
