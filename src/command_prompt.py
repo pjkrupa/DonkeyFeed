@@ -3,6 +3,7 @@ from styles import Prompter, Printer
 import os
 import validators
 from cluster_manager import Clusters
+from utilities import Utilities
 
 # new command class that uses Cmd:
 
@@ -30,6 +31,7 @@ class Command1(cmd.Cmd):
         self.command = None
         self.args = None
         self.index = None
+        self.utilities = Utilities()
         self.rosters = rosters_class
         self.clusters = Clusters()
         self.prompter = Prompter()
@@ -39,8 +41,8 @@ class Command1(cmd.Cmd):
         self.new_roster_name = None
         self.opml_path = None
         self.csv_path = None
-        self.roster_list = [key for key in self.rosters.rosters_loaded]
-        self.cluster_list = [key for key in self.clusters.clusters_loaded]
+        self.roster_list = self.utilities.get_roster_list(self.rosters)
+        self.cluster_list = self.utilities.get_cluster_list(self.clusters)
 
     def set_prompt(self):
         if self.current_cluster:
