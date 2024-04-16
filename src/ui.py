@@ -393,7 +393,6 @@ exit                                Pretty self-explanatory IMO.
             prompt = Command(self.rosters, self.current_roster, self.current_cluster)
 
             if prompt.command == 'run':
-                print(self.current_cluster)
                 for index in prompt.index_list:
                     results = self.run_filter(index)
                     if results is not None:

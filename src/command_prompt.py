@@ -1,31 +1,86 @@
-import pytest
+import cmd
 from styles import Prompter, Printer
 import os
 import validators
 from cluster_manager import Clusters
 
-# the Command class does some basic collecting and parsing of user
-# input and then instantiates:
-# 1) the command; 2) a list of keywords; 3) a list of index numbers
-# and 4) the roster as easily accessible via dot notation on the class object
+# new command class that uses Cmd:
 
-# format for running commands is:
+class Command1(cmd.Cmd):
+    intro = """
+    Hello! Welcome to DonkeyFeed, the worst RSS filter!
+    - type 'help' to see commands
+    - type 'help <command>' to see how to use a command
+    """
 
-# - run <index numbers, separated by commas>
-#   prompt "keywords, separated by commas >> "
-# - run all
-# - delete <index numbers, separated by commas>
-# - roster <roster name>
-# - new
-#   prompt "Feed name >> "
-#   prompt "URL >> "
-#   prompt "keywords, separated by commas >> "
-# - add keywords <index number>
-#   prompt "keywords, separated by commas >> "
-# - remove keywords <index number> <keywords separated by a comma>
-# - list
-# - exit
-# - help
+    def __init__(self, rosters_class):
+        super().__init__()
+        self.current_roster = 'general'
+        self.current_cluster = None
+        self.prompt = self.set_prompt()
+        self.arg_commands = [
+            'run', 'roster', 'delete',
+            'add keywords', 'remove keywords', 'new', 'cluster'
+        ]
+        self.solo_commands = [
+            'help', 'exit', 'import', 'list', 'new', 'export'
+        ]
+        self.index_list = []
+        self.keyword_list = []
+        self.command = None
+        self.args = None
+        self.index = None
+        self.rosters = rosters_class
+        self.clusters = Clusters()
+        self.prompter = Prompter()
+        self.printer = Printer()
+        self.new_title = None
+        self.new_url = None
+        self.new_roster_name = None
+        self.opml_path = None
+        self.csv_path = None
+        self.roster_list = [key for key in self.rosters.rosters_loaded]
+        self.cluster_list = [key for key in self.clusters.clusters_loaded]
+
+    def set_prompt(self):
+        if self.current_cluster:
+            prompt = f'DonkeyFeed/{self.current_roster}::{self.current_roster} >> '
+            return prompt
+        else:
+            prompt = f'DonkeyFeed/{self.current_roster} >> '
+            return prompt
+
+    def check_index(self, index) -> bool:
+        try:
+            index = int(index)
+        except ValueError:
+            return False
+        except TypeError:
+            return False
+        if index < 0 or index > len(self.rosters.rosters_loaded[self.current_roster]):
+            return False
+        else:
+            self.index = index
+            return True
+
+    def make_list_ints(self, string):
+        index_list = []
+        temp_list = string.split(',')
+        for item in temp_list:
+            item = item.strip()
+            if not self.check_index(item):
+                return False
+            else:
+                item = int(item)
+                index_list.append(item)
+        self.index_list = index_list
+        return True
+
+    def do_run(self, args):
+        if self.make_list_ints(args):
+            pass # call the function that runs RSS filters
+        elif args == 'all':
+            pass # call the run_all function
 
 class Command:
     def __init__(self, rosters_class, current_roster, current_cluster):
@@ -103,6 +158,7 @@ class Command:
                 item = int(item)
                 index_list.append(item)
         self.index_list = index_list
+        return True
 
 # takes a string of comma-separated values, makes it a list of strings,
 # and saves it as the self.keywords_list
