@@ -66,7 +66,7 @@ class Session:
         self.printer.default('Your available clusters are: ')
         print_roster = '  |  '.join(self.cluster_list)
         self.printer.default(print_roster)
-        self.printer.default('To open a cluster, enter: cluster <roster name>\n')
+        self.printer.default('To open a cluster, enter: cluster <cluster name>\n')
 
     def list_cluster(self, cluster_name):
         keywords = ', '.join(self.clusters.clusters_loaded[cluster_name])
@@ -304,12 +304,17 @@ class Session:
     def help(self):
         self.printer.default("""
 -----------------------------------------------------------------------------------------------------------------------
-DonkeyFeed saves your feed filters into rosters, and you can group feeds into different rosters if you want. By default, 
- all your feeds are saved to the 'general' roster. 
+DonkeyFeed saves your RSS feed filters into rosters, and you can group feeds into different rosters if you want. 
+By default, all your feeds are saved to the 'general' roster. 
 
 The current roster is indicated in the DonkeyFeed command line (ie - 'DonkeyFeed/general >> ').
 If you do want to use different rosters, just type 'roster <roster name>' and the new current roster will be indicated
 in the command line (ie - 'DonkeyFeed/new roster >>').
+
+DonkeyFeed also offers the possibility of searching rosters against custom groups of keywords, called clusters.
+Add a cluster by typing 'cluster new'. Load a cluster by typing 'cluster <cluster name>'.
+When a cluster is loaded, it will be indicated in the command line (ie - 'DonkeyFeed/general::cluster_name >>') 
+If no cluster is loaded, DonkeyFeed filters each RSS feed based on 
 
 -----------------------------------------------------------------------------------------------------------------------
 
@@ -333,6 +338,15 @@ new                                 Saves a new RSS feed filter to the roster. Y
                                     
 new roster                          Creates a new roster. You can then add to the roster using the 'new' command or the
                                     'import' command.
+
+cluster                             Takes several arguments:
+                                        - cluster list              : lists all clusters
+                                        - cluster <cluster name>    : loads a cluster
+                                        - cluster off               : unloads current cluster
+                                        - cluster new               : new cluster
+                                        - cluster delete            : deletes a cluster
+                                        - cluster add <keywords>    : adds keywords to the current cluster
+                                        - cluster remove <keywords> : removes keywords from the current cluster
                                     
 delete <index numbers>              Deletes one or more saved feed filters from the roster, with multiple index numbers
                                     being separated by commas. (eg: 'delete 5, 8, 12')
