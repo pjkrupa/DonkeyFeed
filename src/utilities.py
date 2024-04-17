@@ -43,7 +43,7 @@ class Utilities:
             else:
                 item = int(item)
                 index_list.append(item)
-                return index_list
+            return index_list
 
     def make_list_strs(self, string):
         keywords_list = []

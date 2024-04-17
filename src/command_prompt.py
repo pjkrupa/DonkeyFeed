@@ -52,11 +52,42 @@ class Command1(cmd.Cmd):
             prompt = f'DonkeyFeed/{self.current_roster} >> '
             return prompt
 
+    def run_once(self, index_num):
+        results = self.utilities.run_filter(
+            self.rosters,
+            self.clusters,
+            self.current_cluster,
+            index_num
+        )
+        if results is not None:
+            findings, keywords_found = results
+            return findings, keywords_found
+
     def do_run(self, args):
-        if self.make_list_ints(args):
-            pass # call the function that runs RSS filters
-        elif args == 'all':
-            pass # call the run_all function
+        if args == 'all':
+            self.index_list = [index for index, _ in enumerate(self.rosters.rosters_loaded[self.current_roster])]
+        elif self.utilities.make_list_ints(self.rosters, args):
+            self.index_list = self.utilities.make_list_ints(self.rosters, args)
+        full_results = {'new stuff': [], 'old stuff': []}
+        all_keywords_found = {'new keywords': [], 'old keywords': []}
+        for index_num in self.index_list:
+            results = self.utilities.run_filter(
+                self.rosters,
+                self.clusters,
+                self.current_cluster,
+                index_num
+            )
+            if results is not None:
+                findings, keywords_found = results
+                full_results['new stuff'].extend(findings['new stuff'])
+                full_results['old stuff'].extend(findings['old stuff'])
+                all_keywords_found['new keywords'].extend(keywords_found['new keywords'])
+                all_keywords_found['old keywords'].extend(keywords_found['old keywords'])
+        self.rosters.save()
+        self.rosters.save_timestamps()
+        path = self.utilities.save_to_html(full_results, all_keywords_found)
+        self.utilities.open_findings(path)
+
 
 class Command:
     def __init__(self, rosters_class, current_roster, current_cluster):

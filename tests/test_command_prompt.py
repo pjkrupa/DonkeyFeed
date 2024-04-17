@@ -4,12 +4,13 @@ current_dir = os.path.dirname(os.path.realpath(__file__))
 src_dir = os.path.abspath(os.path.join(current_dir, '..', 'src'))
 sys.path.append(src_dir)
 
-from command_prompt import Command
-from cluster_manager import Clusters
-from unittest.mock import patch, MagicMock
 import random
 import pytest
 from typing import List
+from src.command_prompt import Command
+from src.cluster_manager import Clusters
+from unittest.mock import patch, MagicMock
+
 
 class MockClusters:
     def __init__(self):
@@ -405,3 +406,4 @@ def test_prompt_response_new_roster(monkeypatch):
     with patch('builtins.input', return_value='new roster'):
         command_instance = Command(mock_rosters, 'general', 'GenAI')
         assert command_instance.prompt(command_instance.roster_name, 'GenAI') == 'new roster'
+

@@ -4,10 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="sketched out new Command class using cmd.Cmd, starting big refactor.">
-      <change afterPath="$PROJECT_DIR$/src/utilities.py" afterDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added a few more functions to Utilities">
+      <change afterPath="$PROJECT_DIR$/src/new_command_test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/command_prompt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utilities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_command_prompt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -525,7 +527,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713276124430</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="added utilities module with Utilities class containing functions from ui.py">
+      <option name="closed" value="true" />
+      <created>1713280162703</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1713280162703</updated>
+    </task>
+    <task id="LOCAL-00037" summary="added a few more functions to Utilities">
+      <option name="closed" value="true" />
+      <created>1713281073639</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1713281073639</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -544,8 +562,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="got the 'run feed filter' part working" />
-    <MESSAGE value="fixed some UI problems, added color" />
     <MESSAGE value="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho." />
     <MESSAGE value="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters" />
     <MESSAGE value="added the text for the 'help' screen" />
@@ -569,34 +585,36 @@
     <MESSAGE value="deleted a few files, housekeeping." />
     <MESSAGE value="deleted a few files, housekeeping" />
     <MESSAGE value="sketched out new Command class using cmd.Cmd, starting big refactor." />
-    <option name="LAST_COMMIT_MESSAGE" value="sketched out new Command class using cmd.Cmd, starting big refactor." />
+    <MESSAGE value="added utilities module with Utilities class containing functions from ui.py" />
+    <MESSAGE value="added a few more functions to Utilities" />
+    <option name="LAST_COMMIT_MESSAGE" value="added a few more functions to Utilities" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
-          <line>241</line>
+          <line>242</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
-          <line>240</line>
+          <line>241</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
-          <line>243</line>
+          <line>244</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
-          <line>344</line>
+          <line>345</line>
           <option name="timeStamp" value="13" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/tests/test_command_prompt.py</url>
-          <line>343</line>
+          <line>344</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
       </breakpoints>
