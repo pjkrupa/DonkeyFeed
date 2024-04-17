@@ -52,17 +52,6 @@ class Command1(cmd.Cmd):
             prompt = f'DonkeyFeed/{self.current_roster} >> '
             return prompt
 
-    def run_once(self, index_num):
-        results = self.utilities.run_filter(
-            self.rosters,
-            self.clusters,
-            self.current_cluster,
-            index_num
-        )
-        if results is not None:
-            findings, keywords_found = results
-            return findings, keywords_found
-
     def do_run(self, args):
         if args == 'all':
             self.index_list = [index for index, _ in enumerate(self.rosters.rosters_loaded[self.current_roster])]
@@ -87,6 +76,38 @@ class Command1(cmd.Cmd):
         self.rosters.save_timestamps()
         path = self.utilities.save_to_html(full_results, all_keywords_found)
         self.utilities.open_findings(path)
+
+    def do_new(self, args):
+        if args == 'roster':
+            roster_name = self.prompter.default('Roster name ')
+            dummy_title = 'peter krupa dot lol'
+            dummy_url = 'https://www.peterkrupa.lol/feed'
+            dummy_keywords = ['live', 'laugh', 'love']
+            self.rosters.add_rss_feed(
+                dummy_title,
+                dummy_url,
+                dummy_keywords,
+                roster_name
+            )
+            self.rosters.save()
+            self.roster_list = self.utilities.get_roster_list(self.rosters)
+        elif args == '':
+            name = self.prompter.default('RSS feed name (or type "cancel") >> ')
+            if name == 'cancel':
+                return
+            while True:
+                url = self.prompter.default('RSS feed URL (or type "cancel") >> ')
+                if url == 'cancel':
+                    return
+                elif not validators.url(url):
+                    self.printer.default('This is not a valid URL. Try again.')
+                else:
+                    break
+            keyword_string = self.prompter.default('Keywords, separated by commas >> ')
+            keyword_list = self.utilities.make_list_strs(keyword_string)
+            self.rosters.add_rss_feed(name, url, keyword_list, self.current_roster)
+            self.rosters.save()
+            self.printer.default("All done.")
 
 
 class Command:
