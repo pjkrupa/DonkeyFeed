@@ -1,5 +1,6 @@
 import webbrowser
 import time
+import re
 from datetime import datetime as dt
 import os
 from pathlib import Path
@@ -33,12 +34,12 @@ class Utilities:
             else:
                 return True
 
-    def make_list_ints(self, rosters, string):
+    def make_list_ints(self, rosters, current_roster, string):
         index_list = []
         temp_list = string.split(',')
         for item in temp_list:
             item = item.strip()
-            if not self.check_index(rosters, item):
+            if not self.check_index(rosters, current_roster, item):
                 return False
             else:
                 item = int(item)
@@ -53,45 +54,45 @@ class Utilities:
             keywords_list.append(item)
         return keywords_list
 
-    def check_index(self, rosters, index):
+    def check_index(self, rosters, current_roster, index):
         try:
             index = int(index)
         except ValueError:
             return False
         except TypeError:
             return False
-        if index < 0 or index > len(rosters.rosters_loaded[self.current_roster]):
+        if index < 0 or index > len(rosters.rosters_loaded[current_roster]):
             return False
         else:
             return True
 
     # a method for printing out the roster
     # 'rosters' and 'clusters are the class objects that should be given every time this is called
-    def list_rss_feeds(self, rosters, clusters):
+    def list_rss_feeds(self, rosters, clusters, current_roster):
         roster_list = self.get_roster_list(rosters)
         cluster_list = self.get_cluster_list(clusters)
-        print("Here are the saved RSS feed filters for the current roster: ", self.current_roster)
+        print("Here are the saved RSS feed filters for the current roster: ", current_roster)
         dashes = '-' * 120
         self.printer.default(dashes)
         self.printer.default('{0:10}{1:40}{2:40}{3}'.format('Index', 'RSS feed name', 'URL', 'Keywords'))
         self.printer.default(dashes)
         # self.rosters.rosters_loaded is the loaded JSON file
-        for i in range(len(rosters.rosters_loaded[self.current_roster])):
+        for i in range(len(rosters.rosters_loaded[current_roster])):
             self.printer.default('{0:<10}{1:40}{2:40}{3}'.format(
                 i,
-                rosters.rosters_loaded[self.current_roster][i]['RSS feed name'][:30],
-                rosters.rosters_loaded[self.current_roster][i]['URL'][:30],
-                rosters.rosters_loaded[self.current_roster][i]['keywords'][:30])
+                rosters.rosters_loaded[current_roster][i]['RSS feed name'][:30],
+                rosters.rosters_loaded[current_roster][i]['URL'][:30],
+                rosters.rosters_loaded[current_roster][i]['keywords'][:30])
             )
         self.printer.default(dashes)
         self.printer.default('\n')
         self.printer.default('Your available rosters are: ')
-        print_roster = '  |  '.join(self.roster_list)
+        print_roster = '  |  '.join(roster_list)
         self.printer.default(print_roster)
         self.printer.default('To change roster, enter: roster <roster name>\n')
         self.printer.default('Your available clusters are: ')
-        print_roster = '  |  '.join(cluster_list)
-        self.printer.default(print_roster)
+        print_cluster = '  |  '.join(cluster_list)
+        self.printer.default(print_cluster)
         self.printer.default('To open a cluster, enter: cluster <cluster name>\n')
 
     def cluster_info(self, clusters, cluster_name):
@@ -103,38 +104,39 @@ class Utilities:
             self,
             rosters,
             clusters,
+            current_roster,
             current_cluster,
             index_num,
             keywords=None
     ):
         zero_timestamp = dt.min.isoformat()
-        feed_name = rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name']
+        feed_name = rosters.rosters_loaded[current_roster][index_num]['RSS feed name']
         if current_cluster is None:
             cluster = feed_name
         else:
             cluster = current_cluster
         if keywords is None:
             if current_cluster is None:
-                keywords = rosters.rosters_loaded[self.current_roster][index_num]['keywords']
+                keywords = rosters.rosters_loaded[current_roster][index_num]['keywords']
             else:
                 keywords = clusters.clusters_loaded[current_cluster]
 
         rss_parsed = RSSfilter(
-            rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name'],
-            rosters.rosters_loaded[self.current_roster][index_num]['URL'],
+            rosters.rosters_loaded[current_roster][index_num]['RSS feed name'],
+            rosters.rosters_loaded[current_roster][index_num]['URL'],
             keywords
         )
         if rss_parsed.rss_dict is None:
             return
         rss_parsed.process()
-        if cluster not in rosters.timestamps[self.current_roster][feed_name]:
-            rosters.timestamps[self.current_roster][feed_name][cluster] = zero_timestamp
-        rss_parsed.run_filter(rosters.timestamps[self.current_roster][feed_name][cluster])
-        rosters.timestamps[self.current_roster][feed_name][cluster] = self.timestamp
+        if cluster not in rosters.timestamps[current_roster][feed_name]:
+            rosters.timestamps[current_roster][feed_name][cluster] = zero_timestamp
+        rss_parsed.run_filter(rosters.timestamps[current_roster][feed_name][cluster])
+        rosters.timestamps[current_roster][feed_name][cluster] = self.timestamp
         if len(rss_parsed.findings['new stuff']) + len(rss_parsed.findings['old stuff']) == 0:
             print(
                 "Nothing found for these keywords in ",
-                rosters.rosters_loaded[self.current_roster][index_num]['RSS feed name']
+                rosters.rosters_loaded[current_roster][index_num]['RSS feed name']
             )
         else:
             return rss_parsed.findings, rss_parsed.keywords_found
@@ -211,44 +213,6 @@ class Utilities:
         except Exception as e:
             print(f'Error writing to {save_path}: {e}')
 
-    # the idea of this being a separate function is to run through
-    # all the filters, save them, and open the findings without pause
-    def run_all_filters(self, rosters, clusters, current_cluster):
-        full_results = {'new stuff': [], 'old stuff': []}
-        all_keywords_found = {'new keywords': [], 'old keywords': []}
-        for i in range(len(rosters.rosters_loaded[self.current_roster])):
-            results = self.run_filter(rosters, clusters, current_cluster, i)
-            if results is not None:
-                findings, keywords_found = results
-                full_results['new stuff'].extend(findings['new stuff'])
-                full_results['old stuff'].extend(findings['old stuff'])
-                all_keywords_found['new keywords'].extend(keywords_found['new keywords'])
-                all_keywords_found['old keywords'].extend(keywords_found['old keywords'])
-        rosters.save()
-        rosters.save_timestamps()
-        path = self.save_to_html(full_results, all_keywords_found)
-        self.open_findings(path)
-
-    def report_findings(self, findings, keywords, feed_name):
-        if (len(findings['new stuff']) + len(findings['old stuff'])) == 0:
-            print("Nothing found for these keywords in ", feed_name)
-            return False
-        elif len(findings['new stuff']) > 0:
-            print("New results were found for the following search terms:")
-            new_kw_set = set(keywords['new keywords'])
-            print(*new_kw_set, sep=', ' + '\n')
-            for item in findings['new stuff']:  # loops through the list of dicts and prints the values
-                self.printer.default(item['title'])
-                print(item['link'])
-                self.printer.default(item['summary'])
-                print('--------------------------')
-        elif len(findings['old stuff']) > 0:
-            print(
-                "No new entries since your last search, but some old "
-                "results were found for the following search terms:\n"
-            )
-            old_kw_set = set(keywords['old keywords'])
-            print(*old_kw_set, sep=', ')
 
     def open_findings(self, html_path):
         fullpath = os.path.join(self.root, html_path)
@@ -256,36 +220,17 @@ class Utilities:
         print(fullpath)
         webbrowser.open('file://' + fullpath)
 
-    def add_rss_feed(self, rosters, new_title, new_url, keyword_list):
-        rosters.add_rss_feed(new_title, new_url, keyword_list, self.current_roster)
+    def add_rss_feed(self, rosters, new_title, new_url, keyword_list, current_roster):
+        rosters.add_rss_feed(new_title, new_url, keyword_list, current_roster)
         rosters.save()
         self.printer.default("All done.")
 
-    def delete_all(self, rosters, current_roster):
-        if current_roster == 'general':
-            print("You can't delete the 'general' roster.")
-            return False
-        if self.yesno(f'Are you sure you want to delete the entire {current_roster} roster?'):
-            rosters.delete_roster(current_roster)
-            rosters.save()
-
-            self.current_roster = 'general'
-            print("All done! Roster deleted.")
-
-    def delete_timestamps(self, rosters):
-        if self.yesno('This will reset all the timestamps in this roster to zero. Are you sure?'):
-            zero_timestamp = dt.min.isoformat()
-            for rss_feed in rosters.timestamps[self.current_roster]:
-                for key, value in enumerate(rss_feed):
-                    rss_feed[key] = zero_timestamp
-            rosters.save_timestamps()
-
-    def remove_rss_feed(self, rosters, index_list):
+    def remove_rss_feed(self, rosters, current_roster, index_list):
         print(*index_list, sep=', ')
         if self.yesno('Are you sure you want to delete?'):
             index_list.sort(reverse=True)
             for index in index_list:
-                rosters.remove_rss_feed(index, self.current_roster)
+                rosters.remove_rss_feed(index, current_roster)
             rosters.save()
             self.printer.default("All done.")
 
@@ -299,14 +244,23 @@ class Utilities:
         rosters.save()
         self.printer.default("All done.")
 
-    def new_roster(self, rosters, roster_name):
-        dummy_title = 'peter krupa dot lol'
-        dummy_url = 'https://www.peterkrupa.lol/feed'
-        dummy_keywords = ['live', 'laugh', 'love']
-        rosters.add_rss_feed(
-            dummy_title,
-            dummy_url,
-            dummy_keywords,
-            roster_name
-        )
-        rosters.save()
+    def check_range(self, args, rosters, current_roster):
+        pattern = r'\d+-\d+'
+        match = re.match(pattern, args)
+        if not match:
+            return False
+        range_list = args.split('-')
+        for index in range_list:
+            if not self.check_index(rosters, current_roster, index):
+                return False
+        if range_list[0] >= range_list[1]:
+            return False
+        else:
+            return True
+
+    def set_range(self, args):
+        range_list = args.split('-')
+        index_list = []
+        for i in range(range_list[0], range_list[1]+1):
+            index_list.append(i)
+        return index_list

@@ -2,6 +2,7 @@ import cmd
 from styles import Prompter, Printer
 import os
 import validators
+from datetime import datetime as dt
 from cluster_manager import Clusters
 from utilities import Utilities
 
@@ -28,17 +29,11 @@ class Command1(cmd.Cmd):
         ]
         self.index_list = []
         self.keyword_list = []
-        self.command = None
-        self.args = None
-        self.index = None
         self.utilities = Utilities()
         self.rosters = rosters_class
         self.clusters = Clusters()
         self.prompter = Prompter()
         self.printer = Printer()
-        self.new_title = None
-        self.new_url = None
-        self.new_roster_name = None
         self.opml_path = None
         self.csv_path = None
         self.roster_list = self.utilities.get_roster_list(self.rosters)
@@ -55,14 +50,17 @@ class Command1(cmd.Cmd):
     def do_run(self, args):
         if args == 'all':
             self.index_list = [index for index, _ in enumerate(self.rosters.rosters_loaded[self.current_roster])]
-        elif self.utilities.make_list_ints(self.rosters, args):
-            self.index_list = self.utilities.make_list_ints(self.rosters, args)
+        elif self.utilities.check_range(args, self.rosters, self.current_roster):
+            self.index_list = self.utilities.set_range(args)
+        elif self.utilities.make_list_ints(self.rosters, self.current_roster, args):
+            self.index_list = self.utilities.make_list_ints(self.rosters, self.current_roster, args)
         full_results = {'new stuff': [], 'old stuff': []}
         all_keywords_found = {'new keywords': [], 'old keywords': []}
         for index_num in self.index_list:
             results = self.utilities.run_filter(
                 self.rosters,
                 self.clusters,
+                self.current_roster,
                 self.current_cluster,
                 index_num
             )
@@ -108,6 +106,53 @@ class Command1(cmd.Cmd):
             self.rosters.add_rss_feed(name, url, keyword_list, self.current_roster)
             self.rosters.save()
             self.printer.default("All done.")
+
+    def do_list(self, args):
+        if args == '':
+            self.utilities.list_rss_feeds(self.rosters, self.clusters, self.current_roster)
+
+    def do_delete(self, args):
+        if self.utilities.check_range(args, self.rosters, self.current_roster):
+            delete_list = self.utilities.set_range(args)
+            self.utilities.remove_rss_feed(self.rosters, self.current_roster, delete_list)
+        elif self.utilities.make_list_ints(self.rosters, self.current_roster, args):
+            delete_list = self.utilities.make_list_ints(self.rosters, self.current_roster, args)
+            self.utilities.remove_rss_feed(self.rosters, self.current_roster, delete_list)
+        elif args == 'roster':
+            if self.current_roster == 'general':
+                print("You can't delete the 'general' roster.")
+                return False
+            if self.utilities.yesno(f'Are you sure you want to delete the entire {self.current_roster} roster?'):
+                self.rosters.delete_roster(self.current_roster)
+                self.rosters.save()
+                self.current_roster = 'general'
+                print("All done! Roster deleted.")
+        elif args == 'timestamps':
+            if self.utilities.yesno('This will reset all the timestamps in this roster to zero. Are you sure?'):
+                zero_timestamp = dt.min.isoformat()
+                for rss_feed in self.rosters.timestamps[self.current_roster]:
+                    for key, value in enumerate(rss_feed):
+                        rss_feed[key] = zero_timestamp
+                self.rosters.save_timestamps()
+
+
+    def do_import(self, args):
+        pass
+
+    def do_cluster(self, args):
+        pass
+
+    def do_export(self, args):
+        pass
+
+    def do_help(self, args):
+        pass
+
+    def do_readme(self, args):
+        pass
+
+    def do_keywords(self, args):
+        pass
 
 
 class Command:

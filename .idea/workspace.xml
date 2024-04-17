@@ -4,12 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added a few more functions to Utilities">
-      <change afterPath="$PROJECT_DIR$/src/new_command_test.py" afterDir="false" />
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="refactored &quot;new&quot; command into do_new function in new command class">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/command_prompt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/utilities.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_command_prompt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -543,7 +541,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713281073639</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="refactored &quot;run&quot; command into do_run function in new command class">
+      <option name="closed" value="true" />
+      <created>1713340748338</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1713340748338</updated>
+    </task>
+    <task id="LOCAL-00039" summary="refactored &quot;new&quot; command into do_new function in new command class">
+      <option name="closed" value="true" />
+      <created>1713341979907</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1713341979907</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -562,8 +576,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="switching from menu UI to CLI. mostly done, still a lot of work to do on ui.py tho." />
-    <MESSAGE value="squashed a bunch of bugs, added a command for uploading a .CSV of RSS filters" />
     <MESSAGE value="added the text for the 'help' screen" />
     <MESSAGE value="added a couple lines in donkeyfeed.py to set the current directory." />
     <MESSAGE value="changed some comments" />
@@ -587,7 +599,9 @@
     <MESSAGE value="sketched out new Command class using cmd.Cmd, starting big refactor." />
     <MESSAGE value="added utilities module with Utilities class containing functions from ui.py" />
     <MESSAGE value="added a few more functions to Utilities" />
-    <option name="LAST_COMMIT_MESSAGE" value="added a few more functions to Utilities" />
+    <MESSAGE value="refactored &quot;run&quot; command into do_run function in new command class" />
+    <MESSAGE value="refactored &quot;new&quot; command into do_new function in new command class" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored &quot;new&quot; command into do_new function in new command class" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
