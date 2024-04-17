@@ -20,13 +20,6 @@ class Command1(cmd.Cmd):
         self.current_roster = 'general'
         self.current_cluster = None
         self.prompt = self.set_prompt()
-        self.arg_commands = [
-            'run', 'roster', 'delete',
-            'add keywords', 'remove keywords', 'new', 'cluster'
-        ]
-        self.solo_commands = [
-            'help', 'exit', 'import', 'list', 'new', 'export'
-        ]
         self.index_list = []
         self.keyword_list = []
         self.utilities = Utilities()
@@ -46,6 +39,20 @@ class Command1(cmd.Cmd):
         else:
             prompt = f'DonkeyFeed/{self.current_roster} >> '
             return prompt
+
+    def do_roster(self, args):
+        if args in self.roster_list:
+            self.current_roster = args
+            self.prompt = self.set_prompt()
+
+    def help_roster(self):
+        print(
+            '\n'.join(['roster <roster name>',
+                   'Changes the current roster, which is displayed in the prompt.',
+                    'The default roster is "general".',
+                       'Use the "list rosters" command to see a list of available rosters.'
+                       ])
+        )
 
     def do_run(self, args):
         if args == 'all':
@@ -74,6 +81,22 @@ class Command1(cmd.Cmd):
         self.rosters.save_timestamps()
         path = self.utilities.save_to_html(full_results, all_keywords_found)
         self.utilities.open_findings(path)
+
+    def help_run(self):
+        print(
+            '\n'.join(['>> run all',
+                       'Runs all the saved RSS filters in the current roster.'
+                       ' ',
+                       '>> run [index numbers]',
+                       'Runs the saved RSS filters in the current roster',
+                       'based on their index numbers.'
+                       'Index numbers can be entered individually (run 5),',
+                       'in a list separated by commas (run 5, 7, 8),',
+                       'or in a range (run 4-8).',
+                       'To display RSS filters in the current roster with',
+                       'their index numbers, use the "list" command.'
+                       ])
+        )
 
     def do_new(self, args):
         if args == 'roster':
@@ -107,9 +130,43 @@ class Command1(cmd.Cmd):
             self.rosters.save()
             self.printer.default("All done.")
 
+    def help_new(self):
+        print(
+            '\n'.join(['>> new:',
+                       'Starts a dialog to add a new RSS feed filter',
+                       'to the current roster.',
+                       ' ',
+                       '>> new roster:',
+                       'Starts a dialog to create a new roster.'
+                       ])
+        )
+
     def do_list(self, args):
         if args == '':
             self.utilities.list_rss_feeds(self.rosters, self.clusters, self.current_roster)
+        elif args == 'rosters':
+            self.printer.default('Your available rosters are: ')
+            print_roster = '  |  '.join(self.roster_list)
+            self.printer.default(print_roster)
+            self.printer.default('To change roster, enter: roster <roster name>\n')
+        elif args == 'clusters':
+            self.printer.default('Your available clusters are: ')
+            print_cluster = '  |  '.join(self.cluster_list)
+            self.printer.default(print_cluster)
+            self.printer.default('To open a cluster, enter: cluster <cluster name>\n')
+
+    def help_list(self):
+        print(
+            '\n'.join(['>> list:',
+                       'Displays a list of the RSS feed filters in the current roster.',
+                       ' ',
+                       '>> list rosters',
+                       'Displays a list of your saved rosters.',
+                       ' ',
+                       '>> list clusters',
+                       'Displays a list of your saved clusters.'
+                       ])
+        )
 
     def do_delete(self, args):
         if self.utilities.check_range(args, self.rosters, self.current_roster):
@@ -127,6 +184,12 @@ class Command1(cmd.Cmd):
                 self.rosters.save()
                 self.current_roster = 'general'
                 print("All done! Roster deleted.")
+        elif args == 'cluster':
+            if self.current_cluster:
+                if self.utilities.yesno(f'Are you sure you want to permanently delete the {self.current_cluster} cluster? '):
+                    self.clusters.delete_cluster(self.current_cluster)
+            else:
+                print('No cluster loaded. You have to load a cluster to delete it.')
         elif args == 'timestamps':
             if self.utilities.yesno('This will reset all the timestamps in this roster to zero. Are you sure?'):
                 zero_timestamp = dt.min.isoformat()
@@ -135,14 +198,34 @@ class Command1(cmd.Cmd):
                         rss_feed[key] = zero_timestamp
                 self.rosters.save_timestamps()
 
-
+    def help_delete(self):
+        print(
+            '\n'.join(['>> delete [index numbers]',
+                       'Deletes RSS feed filters in the current roster',
+                       'based on their index numbers.',
+                       'Index numbers can be individual (delete 5),',
+                       'in a list separated by commas (delete 5, 6, 9),',
+                       'or in a range (delete 3-9).'
+                       ' ',
+                       '>> delete roster',
+                       'Deletes the current roster. The default "general" roster',
+                       'cannot be deleted.',
+                       ' ',
+                       '>> delete cluster'
+                       'Deletes the current cluster. You must load a cluster',
+                       'with >> cluster [cluster name] first before you can delete it.',
+                       ' ',
+                       '>> delete timestamps',
+                       'Resets all the timestamps in the roster to zero.'
+                       ])
+        )
     def do_import(self, args):
         pass
 
-    def do_cluster(self, args):
+    def do_export(self, args):
         pass
 
-    def do_export(self, args):
+    def do_cluster(self, args):
         pass
 
     def do_help(self, args):
