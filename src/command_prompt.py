@@ -219,8 +219,30 @@ class Command1(cmd.Cmd):
                        'Resets all the timestamps in the roster to zero.'
                        ])
         )
+
     def do_import(self, args):
-        pass
+        if args == '':
+            path = self.prompter.default('File path >> ').strip()
+            prompt = 'Select the roster where you want to save your RSS feeds. >> '
+            roster_name = self.utilities.roster_pick(prompt, self.roster_list)
+            if roster_name is False:
+                return
+            if not os.path.exists(path):
+                self.printer.default('File not found.')
+                return False
+            elif path.endswith('.csv'):
+                self.rosters.import_csv(path, roster_name)
+                self.rosters.save()
+                self.roster_list = self.utilities.get_roster_list(self.rosters)
+                self.prompter.default('All done. Press <return> to continue.')
+            elif path.endswith('.opml') or path.endswith('.xml'):
+                self.rosters.import_opml(path, roster_name)
+                self.rosters.save()
+                self.roster_list = self.utilities.get_roster_list(self.rosters)
+                self.prompter.default('All done. Press <return> to continue.')
+            else:
+                self.printer.default('Invalid file type, must be a CSV or OPML (XML).')
+                return False
 
     def do_export(self, args):
         pass
@@ -345,9 +367,10 @@ class Command:
             'The default roster is "general" if you simply hit <return>. You can also enter a new roster >> '
         )
         if roster == 'cancel':
-            return
+            return False
         elif roster != '':
-            self.roster_name = roster
+            return roster
+        return 'general'
 
     def set_range(self, args):
         temp_list = args.split(',')

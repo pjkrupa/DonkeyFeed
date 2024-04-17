@@ -264,3 +264,16 @@ class Utilities:
         for i in range(range_list[0], range_list[1]+1):
             index_list.append(i)
         return index_list
+
+    def roster_pick(self, message, roster_list):
+        self.printer.default(message)
+        roster_names = '  |  '.join(roster_list)
+        print(roster_names)
+        roster = self.prompter.default(
+            'The default roster is "general" if you simply hit <return>. You can also enter a new roster >> '
+        )
+        if roster == 'cancel':
+            return False
+        elif roster != '':
+            return roster
+        return 'general'
