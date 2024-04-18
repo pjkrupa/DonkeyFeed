@@ -245,7 +245,12 @@ class Command1(cmd.Cmd):
                 return False
 
     def do_export(self, args):
-        pass
+        if args == '':
+            if self.utilities.yesno('This will export your current roster to a .CSV file. Go ahead?'):
+                path = self.rosters.export_csv(self.current_roster)
+                print(f'All done! Your roster has been exported and saved at {path}')
+            else:
+                return False
 
     def do_cluster(self, args):
         pass
