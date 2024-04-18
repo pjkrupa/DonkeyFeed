@@ -4,9 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added 'remove' argument to do_keywords method.">
+    <list default="true" id="25dad1d7-ed8b-4424-a55b-ddc3ec75aa1c" name="Changes" comment="added some help documentation">
+      <change afterPath="$PROJECT_DIR$/src/scrap_pile.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/04-18-2024 at 14:00.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/04-18-2024 at 14:10.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/user/search_results/04-18-2024 at 14:15.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/command_prompt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/command_prompt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/donkeyfeed.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/donkeyfeed.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/user/timestamps.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/user/timestamps.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +160,7 @@
       <recent name="$PROJECT_DIR$/main/user" />
     </key>
   </component>
-  <component name="RunManager" selected="Python tests.Python tests for test_command_prompt.test_cluster">
+  <component name="RunManager">
     <configuration name="Python tests for test_command_prompt.test_cluster" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
       <module name="DonkeyFeed" />
       <option name="ENV_FILES" value="" />
@@ -255,14 +261,6 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1704097202661</updated>
-    </task>
-    <task id="LOCAL-00001" summary="first commit!">
-      <option name="closed" value="true" />
-      <created>1704903457456</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1704903457456</updated>
     </task>
     <task id="LOCAL-00002" summary="first commit!">
       <option name="closed" value="true" />
@@ -648,7 +646,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713429156090</updated>
     </task>
-    <option name="localTasksCounter" value="50" />
+    <task id="LOCAL-00050" summary="added some help documentation">
+      <option name="closed" value="true" />
+      <created>1713441175303</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1713441175303</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -677,7 +683,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
-    <MESSAGE value="finished unit tests for command_prompt.py" />
     <MESSAGE value="added a timestamp so users can see if an RSS feed has been updated since last search" />
     <MESSAGE value="added a 'cluster' feature so users can run RSS feeds against preset keyword lists" />
     <MESSAGE value="clearing out some saved HTML searches" />
@@ -702,7 +707,8 @@
     <MESSAGE value="added 'off' argument to do_cluster" />
     <MESSAGE value="added 'add' argument to do_keywords method. also split rss feed list method in Utilities class into two methods" />
     <MESSAGE value="added 'remove' argument to do_keywords method." />
-    <option name="LAST_COMMIT_MESSAGE" value="added 'remove' argument to do_keywords method." />
+    <MESSAGE value="added some help documentation" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some help documentation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
