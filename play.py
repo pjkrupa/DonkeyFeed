@@ -1,32 +1,26 @@
 import cmd
 
-class Prompt(cmd.Cmd):
-    intro = 'Welcome to DonkeyFeed, the worst RSS reader!'
 
-    def __init__(self):
-        super().__init__()
-        self.roster = 'general'
-        self.prompt = f'DonkeyFeed/{self.roster} >> '
-        self.test_variable = 'start value'
-        self.roster_list = ['foo', 'fah']
+class HelloWorld(cmd.Cmd):
+    """Simple command processor example."""
 
-    def do_hello(self, line):
-        print("Well, ", line, " right back at you!")
+    def do_greet(self, person):
+        if person:
+            print
+            "hi,", person
+        else:
+            print
+            'hi'
 
-    def update_prompt(self):
-        self.prompt = f'DonkeyFeed/{self.roster} >> '
+    def help_greet(self):
+        print('\n'.join(['greet [person]',
+                   'Greet the named person',
+                   ]))
 
-    def do_exit(self, line):
+    def do_EOF(self, line):
         return True
 
-    def do_run(self, index_nums):
 
-
-    def do_roster(self, argument):
-        if argument in self.roster_list:
-            self.roster = argument
-            self.update_prompt()
-
-if __name__ == "__main__":
-    Prompt().cmdloop()
+if __name__ == '__main__':
+    HelloWorld().cmdloop()
 

@@ -429,9 +429,6 @@ class Command(cmd.Cmd):
                     self.printer.default("All done. Keywords removed.")
                     return
 
-    def do_help(self, args):
-        pass
-
     def do_readme(self, args):
         pass
 
