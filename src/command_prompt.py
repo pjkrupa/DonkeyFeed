@@ -47,10 +47,30 @@ class Command1(cmd.Cmd):
 
     def help_roster(self):
         print(
-            '\n'.join(['roster <roster name>',
-                   'Changes the current roster, which is displayed in the prompt.',
-                    'The default roster is "general".',
-                       'Use the "list rosters" command to see a list of available rosters.'
+            '\n'.join(['In DonkeyFeed, a roster is a saved list of RSS feed filters.',
+                       'It gives you the opportunity to group RSS filters according',
+                       'to some criteria. You could have one roster for food blogs,',
+                       'another for politics, another for birdwatching, etc.',
+                       'Also, if you don\'t want to use rosters, the default roster is "general"',
+                       'and all your feeds will save there automatically.',
+                       'The current roster is indicated in the DonkeyFeed command prompt:',
+                       'DonkeyFeed/[roster name] >>',
+                       'So if you\'re in the "general" roster:',
+                       'DonkeyFeed/general >>',
+                       ' ',
+                       'To see a list of saved rosters:',
+                       '>> list rosters',
+                       ' ',
+                       'To add a roster, type:',
+                       '>> new roster',
+                       ' ',
+                       'To add a roster from a saved OMPL or CSV file:',
+                       '>> import',
+                       '(for more info on this very useful mechanic, ">> help import")',
+                       ' ',
+                       'To delete the current roster:'
+                       '>> delete roster',
+                       '(you can\'t delete the "general" roster.)',
                        ])
         )
 
@@ -84,15 +104,22 @@ class Command1(cmd.Cmd):
 
     def help_run(self):
         print(
-            '\n'.join(['>> run all',
+            '\n'.join(['The "run" command runs RSS feed filters, saves the',
+                       'results as an HTML file, and displays the results in',
+                       'a browser.',
+                       'The command operates on the current roster and the current',
+                       'cluster (if one is loaded. for more info: >> help cluster).',
+                       ' ',
+                       'There are two ways to use "run":',
+                       '>> run all',
                        'Runs all the saved RSS filters in the current roster.'
                        ' ',
                        '>> run [index numbers]',
                        'Runs the saved RSS filters in the current roster',
-                       'based on their index numbers.'
-                       'Index numbers can be entered individually (run 5),',
-                       'in a list separated by commas (run 5, 7, 8),',
-                       'or in a range (run 4-8).',
+                       'selected by index number.'
+                       'Index numbers can be entered individually (>> run 5),',
+                       'in a list separated by commas (>> run 5, 7, 8),',
+                       'or in a range (>> run 4-8).',
                        'To display RSS filters in the current roster with',
                        'their index numbers, use the "list" command.'
                        ])
@@ -267,6 +294,25 @@ class Command1(cmd.Cmd):
                 self.printer.default('Invalid file type, must be a CSV or OPML (XML).')
                 return False
 
+    def help_import(self):
+        print(
+            '\n'.join(['>> import',
+                       'Launches a dialog for importing RSS feeds into a roster',
+                       'from an .OPML/.XML file exported from an RSS reader,',
+                       'or from a .CSV file where each row has the following format:',
+                       '"[RSS feed name],[URL],[keyword],[keyword],[keyword]...',
+                       'This provides an easy way to build a roster in a spreadsheet',
+                       'then import it so you don\'t have to use the "new" command to add',
+                       'each filter.'
+                       ' ',
+                       'Also, if you\'ve exported your feeds from an RSS reader as',
+                       'an OPML file (ending in either .xml or .opml), you can import',
+                       'it into DonkeyFeed, then use the ">> export" command to export',
+                       'it as a .CSV, add whatever search keywords you want, and use ">> import"',
+                       'to add them to a roster with your search keywords included.'
+                       ])
+        )
+
     def do_export(self, args):
         if args == '':
             if self.utilities.yesno('This will export your current roster to a .CSV file. Go ahead?'):
@@ -275,9 +321,24 @@ class Command1(cmd.Cmd):
             else:
                 return False
 
+    def help_export(self):
+        print(
+            '\n'.join(['>> export',
+                       'Launches a dialog for exporting the current roster to a CSV file.',
+                       'This is useful if you want to save your roster for some reason.',
+                       'Also, if you\'ve imported an OPML file, producing a roster of',
+                       'just RSS feeds with no search keywords, you can use ">> export"',
+                       'to send the list of feeds to a CSV file, add your search keywords,'
+                       'then re-import the CSV file with all your search keywords.'
+                       ])
+        )
     def do_cluster(self, args):
+        if args in self.cluster_list:
+            self.current_cluster = args
+            self.prompt = self.set_prompt()
+            return True
         if not self.current_cluster:
-            print('You need to load a cluster with >> cluster [cluster name] before you can do this.')
+            print('You need to load a cluster using >> cluster [cluster name] before you can use this command.')
             return False
         if args == 'add':
             new_kw_string = self.prompter.default('Keywords to add >>')
@@ -294,11 +355,44 @@ class Command1(cmd.Cmd):
             self.cluster_list = self.utilities.get_cluster_list(self.clusters)
             self.prompt = self.set_prompt()
 
-    def do_help(self, args):
-        pass
+    def help_cluster(self):
+        print(
+            '\n'.join(['In DonkeyFeed, a "cluster" is a saved group of search keywords that',
+                       'you can use to filter the RSS feeds in your rosters. If a cluster',
+                       'is loaded, it replaces the saved search keywords in your roster.',
+                       'Clusters let you save collections of related search terms and run',
+                       'them at different times and against different rosters.',
+                       'Clusters are a powerful and flexible tool, but they are completely optional.',
+                       ' ',
+                       'To create a cluster, type:',
+                       '>> new cluster',
+                       ' ',
+                       'To view your clusters, type:',
+                       '>> list clusters',
+                       ' ',
+                       'In order to do anything with a cluster, you have to load it first.',
+                       'To load a cluster, type:',
+                       '>> cluster [cluster name]',
+                       '... and the loaded cluster will appear in the DonkeyFeed prompt:',
+                       'DonkeyFeed/general::cluster_name >> ',
+                       ' ',
+                       'Once a cluster is loaded, any "run" commands will run against the',
+                       'keywords found in the loaded cluster.',
+                       ' ',
+                       'To add keywords to a cluster, type:',
+                       '>> cluster add',
+                       ' ',
+                       'To remove keywords from a cluster, type:',
+                       '>> cluster remove',
+                       ' ',
+                       'To delete a cluster, type:',
+                       '>> delete cluster',
+                       ' ',
+                       'To un-load a cluster, type:',
+                       '>> cluster off'
 
-    def do_readme(self, args):
-        pass
+                       ])
+        )
 
     def do_keywords(self, args):
         if args == 'add':
@@ -333,6 +427,11 @@ class Command1(cmd.Cmd):
                     self.printer.default("All done. Keywords removed.")
                     return True
 
+    def do_help(self, args):
+        pass
+
+    def do_readme(self, args):
+        pass
 
 
 
