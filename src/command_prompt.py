@@ -126,7 +126,7 @@ class Command1(cmd.Cmd):
             new_kw_list = self.utilities.make_list_strs(keywords)
             self.clusters.new_cluster(name, new_kw_list)
             self.clusters.save_clusters()
-        elif args == '':
+        elif args == 'filter':
             name = self.prompter.default('RSS feed name (or type "cancel") >> ')
             if name == 'cancel':
                 return
@@ -146,7 +146,7 @@ class Command1(cmd.Cmd):
 
     def help_new(self):
         print(
-            '\n'.join(['>> new:',
+            '\n'.join(['>> new filter:',
                        'Starts a dialog to add a new RSS feed filter',
                        'to the current roster.',
                        ' ',
@@ -199,12 +199,17 @@ class Command1(cmd.Cmd):
             if self.utilities.yesno(f'Are you sure you want to delete the entire {self.current_roster} roster?'):
                 self.rosters.delete_roster(self.current_roster)
                 self.rosters.save()
+                self.roster_list = self.utilities.get_roster_list(self.rosters)
                 self.current_roster = 'general'
+                self.prompt = self.set_prompt()
                 print("All done! Roster deleted.")
         elif args == 'cluster':
             if self.current_cluster:
                 if self.utilities.yesno(f'Are you sure you want to permanently delete the {self.current_cluster} cluster? '):
                     self.clusters.delete_cluster(self.current_cluster)
+                    self.current_cluster = None
+                    self.cluster_list = self.utilities.get_cluster_list(self.clusters)
+                    self.prompt = self.set_prompt()
             else:
                 print('No cluster loaded. You have to load a cluster to delete it.')
         elif args == 'timestamps':
