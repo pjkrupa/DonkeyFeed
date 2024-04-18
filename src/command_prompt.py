@@ -305,7 +305,9 @@ class Command1(cmd.Cmd):
             self.utilities.list_current_roster(self.rosters, self.current_roster)
             while True:
                 index_num = self.utilities.prompter("Enter the index number of the filter where you want to add the keywords >> ")
-                if not self.utilities.check_index(self.rosters, self.current_roster, index_num):
+                if index_num == 'cancel':
+                    return False
+                elif not self.utilities.check_index(self.rosters, self.current_roster, index_num):
                     print('Invalid index number. Try again or type "cancel".')
                 else:
                     keyword_string = self.prompter.default('Keywords to add, separated by commas >> ')
@@ -313,6 +315,22 @@ class Command1(cmd.Cmd):
                     self.rosters.add_keywords(index_num, keyword_list, self.current_roster)
                     self.rosters.save()
                     self.printer.default("All done. Keywords added.")
+                    return True
+        elif args == 'remove':
+            self.utilities.list_current_roster(self.rosters, self.current_roster)
+            while True:
+                index_num = self.utilities.prompter(
+                    "Enter the index number of the filter where you want to remove keywords >> ")
+                if index_num == 'cancel':
+                    return False
+                elif not self.utilities.check_index(self.rosters, self.current_roster, index_num):
+                    print('Invalid index number. Try again or type "cancel".')
+                else:
+                    keyword_string = self.prompter.default('Keywords to remove, separated by commas >> ')
+                    keyword_list = self.utilities.make_list_strs(keyword_string)
+                    self.rosters.remove_keywords(index_num, keyword_list, self.current_roster)
+                    self.rosters.save()
+                    self.printer.default("All done. Keywords removed.")
                     return True
 
 
