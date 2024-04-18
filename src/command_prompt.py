@@ -112,6 +112,20 @@ class Command1(cmd.Cmd):
             )
             self.rosters.save()
             self.roster_list = self.utilities.get_roster_list(self.rosters)
+        elif args == 'cluster':
+            name = ''
+            while True:
+                name = self.prompter.default('Cluster name >>')
+                if name == 'cancel':
+                    return False
+                elif name in self.cluster_list:
+                    print('Cluster name already in use.')
+                else:
+                    break
+            keywords = self.prompter.default('Keywords, separated by commas >>')
+            new_kw_list = self.utilities.make_list_strs(keywords)
+            self.clusters.new_cluster(name, new_kw_list)
+            self.clusters.save_clusters()
         elif args == '':
             name = self.prompter.default('RSS feed name (or type "cancel") >> ')
             if name == 'cancel':
@@ -136,8 +150,11 @@ class Command1(cmd.Cmd):
                        'Starts a dialog to add a new RSS feed filter',
                        'to the current roster.',
                        ' ',
-                       '>> new roster:',
+                       '>> new roster',
                        'Starts a dialog to create a new roster.'
+                       ' ',
+                       '>> new cluster',
+                       'Starts a dialog to create a new cluster.'
                        ])
         )
 
@@ -252,8 +269,9 @@ class Command1(cmd.Cmd):
             else:
                 return False
 
+# cluster arguments: 'off', 'new', 'add', 'remove', 'delete'
     def do_cluster(self, args):
-        pass
+
 
     def do_help(self, args):
         pass
