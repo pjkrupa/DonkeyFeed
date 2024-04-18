@@ -160,7 +160,8 @@ class Command1(cmd.Cmd):
 
     def do_list(self, args):
         if args == '':
-            self.utilities.list_rss_feeds(self.rosters, self.clusters, self.current_roster)
+            self.utilities.list_current_roster(self.rosters, self.current_roster)
+            self.utilities.list_rosters_clusters(self.rosters, self.clusters)
         elif args == 'rosters':
             self.printer.default('Your available rosters are: ')
             print_roster = '  |  '.join(self.roster_list)
@@ -274,7 +275,6 @@ class Command1(cmd.Cmd):
             else:
                 return False
 
-# cluster arguments: 'off'
     def do_cluster(self, args):
         if not self.current_cluster:
             print('You need to load a cluster with >> cluster [cluster name] before you can do this.')
@@ -294,8 +294,6 @@ class Command1(cmd.Cmd):
             self.cluster_list = self.utilities.get_cluster_list(self.clusters)
             self.prompt = self.set_prompt()
 
-
-
     def do_help(self, args):
         pass
 
@@ -303,7 +301,22 @@ class Command1(cmd.Cmd):
         pass
 
     def do_keywords(self, args):
-        pass
+        if args == 'add':
+            self.utilities.list_current_roster(self.rosters, self.current_roster)
+            while True:
+                index_num = self.utilities.prompter("Enter the index number of the filter where you want to add the keywords >> ")
+                if not self.utilities.check_index(self.rosters, self.current_roster, index_num):
+                    print('Invalid index number. Try again or type "cancel".')
+                else:
+                    keyword_string = self.prompter.default('Keywords to add, separated by commas >> ')
+                    keyword_list = self.utilities.make_list_strs(keyword_string)
+                    self.rosters.add_keywords(index_num, keyword_list, self.current_roster)
+                    self.rosters.save()
+                    self.printer.default("All done. Keywords added.")
+                    return True
+
+
+
 
 
 class Command:

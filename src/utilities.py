@@ -68,9 +68,7 @@ class Utilities:
 
     # a method for printing out the roster
     # 'rosters' and 'clusters are the class objects that should be given every time this is called
-    def list_rss_feeds(self, rosters, clusters, current_roster):
-        roster_list = self.get_roster_list(rosters)
-        cluster_list = self.get_cluster_list(clusters)
+    def list_current_roster(self, rosters, current_roster):
         print("Here are the saved RSS feed filters for the current roster: ", current_roster)
         dashes = '-' * 120
         self.printer.default(dashes)
@@ -86,6 +84,10 @@ class Utilities:
             )
         self.printer.default(dashes)
         self.printer.default('\n')
+
+    def list_rosters_clusters(self, rosters, clusters):
+        roster_list = self.get_roster_list(rosters)
+        cluster_list = self.get_cluster_list(clusters)
         self.printer.default('Your available rosters are: ')
         print_roster = '  |  '.join(roster_list)
         self.printer.default(print_roster)
@@ -94,6 +96,8 @@ class Utilities:
         print_cluster = '  |  '.join(cluster_list)
         self.printer.default(print_cluster)
         self.printer.default('To open a cluster, enter: cluster <cluster name>\n')
+
+
 
     def cluster_info(self, clusters, cluster_name):
         keywords = ', '.join(clusters.clusters_loaded[cluster_name])
