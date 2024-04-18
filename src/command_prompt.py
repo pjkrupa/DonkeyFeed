@@ -274,7 +274,7 @@ class Command1(cmd.Cmd):
             else:
                 return False
 
-# cluster arguments: 'off', 'add', 'remove'
+# cluster arguments: 'off'
     def do_cluster(self, args):
         if not self.current_cluster:
             print('You need to load a cluster with >> cluster [cluster name] before you can do this.')
@@ -289,6 +289,10 @@ class Command1(cmd.Cmd):
             remove_kw_list = self.utilities.make_list_strs(remove_kw_string)
             self.clusters.remove_keywords(self.current_cluster, remove_kw_list)
             self.clusters.save_clusters()
+        if args == 'off':
+            self.current_cluster = None
+            self.cluster_list = self.utilities.get_cluster_list(self.clusters)
+            self.prompt = self.set_prompt()
 
 
 
